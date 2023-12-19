@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.jrome.payload.LoginDTO;
 import com.jrome.payload.JWTResponseDTO;
 import com.jrome.payload.ProductDTO;
+import com.jrome.payload.RegisterDTO;
 
 import java.io.IOException;
 import java.net.URI;
@@ -16,25 +17,29 @@ public class Main {
     public static void main(String[] args) throws URISyntaxException, IOException, InterruptedException {
 
 
-        // TODO: Be able to log in as admin and save JWT token to a variable - DONE
-        // TODO: Be able to add Milk and Bread to the database, providing JWT - DONE
+// TODO: Be able to log in as admin and save JWT token to a variable - DONE
+// TODO: Be able to add Milk and Bread to the database, providing JWT - DONE
+// TODO: Be able to register as a Customer - DONE
+// TODO: To be able to log in as a Customer and save JWT token to a variable - DONE
+// TODO: Add x3 Spears to a customers cart
 
-        // Lägg till vilken produkt du än vill
-        addProductAsAdmin(
-                "Spartan",
-                300.00,
-                ""
-        );
+//       1 - Lägg till vilken produkt du än vill
+//        addProductAsAdmin(
+//                "Spear",
+//                300.0,
+//                "Throw this shit at Xerxes to make him smile forever"
+//        );
 
+
+//       2 - Skapa och registrera ny customer med användarnamn och lösenord
+//        registerCustomer("Lukas", "SpearInEyesson");
+
+//       3 - Logga in med Lukas
+//        loginCustomer("Lukas", "SpearInEyesson");
 
 
     }
 
-    /**
-     * POST-request
-     *
-     * Loggar in som admin och skickar tillbaka ett String värde innehållandes --> "Bearer " + JWT-Token
-     */
     public static String adminLogin() throws URISyntaxException, IOException, InterruptedException {
         // URL:n vi vill åt, i detta fall den vi behöver för att logga in som admin
         String adminURL = "http://localhost:8080/auth/login";
@@ -84,13 +89,6 @@ public class Main {
 
     }
 
-
-    /**
-     * POST-request
-     *
-     * Loggar in som admin, låter dig bestämma produktnamn, pris och description på önskad produkt
-     * för att sedan skicka in fanskapet i databasen.
-     */
     public static void addProductAsAdmin(String productName,
                                          double productCost,
                                          String productDesc)
@@ -119,7 +117,7 @@ public class Main {
         HttpClient client = HttpClient.newHttpClient();
 
         // Vi skapar requesten vi vill utföra
-        HttpRequest addProduct = HttpRequest.newBuilder()
+        HttpRequest addProductRequest = HttpRequest.newBuilder()
                 .uri(new URI(adminURL))
                 // Detta är pissviktigt också för att säga åt att vi vill skicka i JSON och inte något annat skit
                 .header("Content-Type", "application/json")
@@ -130,7 +128,7 @@ public class Main {
                 .build();
 
         // Efter vi skickat sparar vi det vi får tillbaka i HttpResponse response variabeln
-        HttpResponse<String> response = client.send(addProduct, java.net.http.HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = client.send(addProductRequest, HttpResponse.BodyHandlers.ofString());
 
         // Via denna kan vi få ut en massa skön skit, bland annat status koden som är 200 i vårat fall
         int statusCode = response.statusCode();
@@ -147,5 +145,60 @@ public class Main {
 
         // Skriv ut ProductDTO för att se att det fungerade
         System.out.println(convertedBody);
+    }
+
+    public static void registerCustomer(String username, String password)
+            throws URISyntaxException, IOException, InterruptedException {
+
+        String registerURL = "http://localhost:8080/auth/register";
+
+        var customerCredentials = new RegisterDTO(
+                username,
+                password
+        );
+
+        Gson gson = new Gson();
+        String jsonCustomer = gson.toJson(customerCredentials);
+
+        HttpClient client = HttpClient.newHttpClient();
+
+
+        HttpRequest registerRequest = HttpRequest.newBuilder()
+                .uri(new URI(registerURL))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonCustomer))
+                .build();
+
+        HttpResponse<String> response = client.send(registerRequest, HttpResponse.BodyHandlers.ofString());
+
+        System.out.printf("Response code: %d - %s", response.statusCode(), response.body());
+    }
+
+    public static String loginCustomer(String username, String password)
+            throws URISyntaxException, IOException, InterruptedException {
+
+        String loginURL = "http://localhost:8080/auth/login";
+
+        var customerCredentials = new LoginDTO(
+                username,
+                password
+        );
+
+        Gson gson = new Gson();
+        String jsonCustomer = gson.toJson(customerCredentials);
+
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpRequest loginRequest = HttpRequest.newBuilder()
+                .uri(new URI(loginURL))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonCustomer))
+                .build();
+        HttpResponse<String> response = client.send(loginRequest, HttpResponse.BodyHandlers.ofString());
+
+        var convertedBody = gson.fromJson(response.body(), JWTResponseDTO.class);
+        System.out.println(convertedBody);
+
+        return convertedBody.getTokenType() + " " + convertedBody.getAccessToken();
     }
 }
