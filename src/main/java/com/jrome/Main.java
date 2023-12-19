@@ -17,7 +17,7 @@ public class Main {
 
 
         // TODO: Be able to log in as admin and save JWT token to a variable - DONE
-        // TODO: Be able to add Milk and Bread to the database, providing JWT
+        // TODO: Be able to add Milk and Bread to the database, providing JWT - DONE
 
 
 
