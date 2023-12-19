@@ -1,0 +1,63 @@
+package com.jrome;
+
+import com.google.gson.Gson;
+import com.jrome.payload.LoginDTO;
+import com.jrome.payload.ResponseDTO;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+public class Main {
+    public static void main(String[] args) throws URISyntaxException, IOException, InterruptedException {
+        System.out.println("Hello world!");
+
+        // TODO: Be able to log in as admin and save JWT token to a variable
+
+        // URL:n vi vill åt, i detta fall den vi behöver för att logga in som admin
+        String adminURL = "http://localhost:8080/auth/login";
+
+        // I Postman så måste vi ju skicka med en JSON body för username och password
+        // så vi skapar en LoginDTO klass som representerar det vi ska skicka in och tilldelar alla värden
+        var adminCredentials = new LoginDTO(
+                "admin",
+                "admin"
+        );
+
+        // Vi konverterar sedan klassen till en JSON sträng så vi slipper skriva jobbiga JSON-format själva
+        Gson gson = new Gson();
+        String jsonAdminCredentials = gson.toJson(adminCredentials);
+
+        // Javas egna HttpClient bibliotek som är smidig som satan själv
+        HttpClient client = HttpClient.newHttpClient();
+
+        // Vi skapar requesten vi vill utföra
+        HttpRequest logInRequest = HttpRequest.newBuilder()
+                .uri(new URI(adminURL))
+                // Detta är pissviktigt också för att säga åt att vi vill skicka i JSON och inte något annat skit
+                .header("Content-Type", "application/json")
+                // Själva requesten
+                .POST(HttpRequest.BodyPublishers.ofString(jsonAdminCredentials))
+                .build();
+
+        // Efter vi skickat sparar vi det vi får tillbaka i HttpResponse response variabeln
+        HttpResponse<String> response = client.send(logInRequest, java.net.http.HttpResponse.BodyHandlers.ofString());
+
+        // Via denna kan vi få ut en massa skön skit, bland annat status koden som är 200 i vårat fall
+        int statusCode = response.statusCode();
+
+        // Och det VIKTIGASTE, body:n. Det är här allt gottigott ligger. I detta fall våran JWT-Token response
+        String body = response.body();
+
+        // Så vi tar responsen och konverterar den från JSON till ResponseDTO denna gången med samma
+        // gson objekt som vi använde oss först
+        var convertedBody = gson.fromJson(body, ResponseDTO.class);
+
+        // och skriver sen ut skiten i en simpel toString(). Nu har vi en JWT token sparat och kan använda den hur vi vill
+        System.out.println(convertedBody);
+
+    }
+}
