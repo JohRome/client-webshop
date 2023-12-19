@@ -1,13 +1,13 @@
 package com.jrome.payload;
 
-public class ResponseDTO {
+public class JwtResponse {
     private String tokenType;
     private String accessToken;
 
-    public ResponseDTO() {
+    public JwtResponse() {
     }
 
-    public ResponseDTO(String tokenType, String accessToken) {
+    public JwtResponse(String tokenType, String accessToken) {
         this.tokenType = tokenType;
         this.accessToken = accessToken;
     }
