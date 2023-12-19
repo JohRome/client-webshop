@@ -2,7 +2,7 @@ package com.jrome;
 
 import com.google.gson.Gson;
 import com.jrome.payload.LoginDTO;
-import com.jrome.payload.JwtResponse;
+import com.jrome.payload.JWTResponseDTO;
 import com.jrome.payload.ProductDTO;
 
 import java.io.IOException;
@@ -19,9 +19,22 @@ public class Main {
         // TODO: Be able to log in as admin and save JWT token to a variable - DONE
         // TODO: Be able to add Milk and Bread to the database, providing JWT - DONE
 
+        // Lägg till vilken produkt du än vill
+        addProductAsAdmin(
+                "Spartan",
+                300.00,
+                ""
+        );
+
 
 
     }
+
+    /**
+     * POST-request
+     *
+     * Loggar in som admin och skickar tillbaka ett String värde innehållandes --> "Bearer " + JWT-Token
+     */
     public static String adminLogin() throws URISyntaxException, IOException, InterruptedException {
         // URL:n vi vill åt, i detta fall den vi behöver för att logga in som admin
         String adminURL = "http://localhost:8080/auth/login";
@@ -60,15 +73,24 @@ public class Main {
 
         // Så vi tar responsen och konverterar den från JSON till ResponseDTO denna gången med samma
         // gson objekt som vi använde oss först
-        var convertedBody = gson.fromJson(body, JwtResponse.class);
+        var convertedBody = gson.fromJson(body, JWTResponseDTO.class);
 
-        // och skriver sen ut skiten i en simpel toString(). Nu har vi en JWT token sparat och kan använda den hur vi vill
-        // System.out.println(convertedBody);
+        // och skriver sen ut skiten i en simpel toString(), bara för skojs skull.
+        System.out.println(convertedBody);
 
+        // Vi gör det enkelt och fult och skickar med JWT-Token response som en String som kan användas i alla
+        // admin requests
         return convertedBody.getTokenType() + " " + convertedBody.getAccessToken();
 
     }
 
+
+    /**
+     * POST-request
+     *
+     * Loggar in som admin, låter dig bestämma produktnamn, pris och description på önskad produkt
+     * för att sedan skicka in fanskapet i databasen.
+     */
     public static void addProductAsAdmin(String productName,
                                          double productCost,
                                          String productDesc)
