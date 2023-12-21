@@ -2,6 +2,7 @@ package com.jrome.utils;
 
 public class Menu {
 
+
     public static void showMainMenu() {
         System.out.println("""
                 Main menu

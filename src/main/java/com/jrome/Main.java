@@ -15,6 +15,9 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.jrome.utils.JSONConverter.dtoToJSON;
+import static com.jrome.utils.JSONConverter.jsonToDto;
+
 public class Main {
     public static void main(String[] args) {
 
@@ -22,12 +25,19 @@ public class Main {
         // TODO 1: Download Lombok - DONE
         // TODO 2: Make menus - One for admin and one for customer - DONE
         // TODO 3: Static Input class for user inputs - DONE
-        // TODO 4: Static Output class for the frontend if needed
-        // TODO 5: Handler classes(?) for the payload class(es) so we can construct objects we need
+        // TODO 4: Static Output class for the frontend if needed - WAIT WITH THIS
+        // TODO 5: Handler classes(?) for the payload class(es) so we can construct objects we need - WAIT WITH THIS
         // TODO 6: Place methods below in classes
         // TODO 6.1: Make methods more dynamic, not hardcoded as they are now
         // TODO 6.2: Better storage for JWT-Token is needed. Feels cunty to make a new login everytime
+        // TODO: 6.3: The HttpClient.class needs to implement all of the http request methods - GET/POST/PUT/DELETE
+        // TODO: 6.3.1: Each method needs to be implemented in such way that it's as dynamical as possible
+        // TODO: 6.4: AdminAPI.class uses methods from the HttpClient.class and ONLY admin related requests
+        // TODO: 6.5: CustomerAPI.class uses methods from the HttpClient.class and ONLY customer related requests
+
     }
+
+    // TODO: Need to test methods below with webshop's branch: sandra-new
 
     public static String adminLogin() throws URISyntaxException, IOException, InterruptedException {
         // URL:n vi vill åt, i detta fall den vi behöver för att logga in som admin
@@ -77,6 +87,7 @@ public class Main {
         return convertedBody.getTokenType() + " " + convertedBody.getAccessToken();
 
     }
+
 
     public static void addProductAsAdmin(String productName,
                                          double productCost,
