@@ -2,7 +2,7 @@ package com.jrome.httpclient;
 
 public class HttpClient {
 
-    // Create all the Client stuff
+    // Create all the HttpClient stuff
 
     // Dynamic GET-request
 
