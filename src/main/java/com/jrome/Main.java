@@ -1,43 +1,32 @@
 package com.jrome;
 
 import com.google.gson.Gson;
-import com.jrome.payload.LoginDTO;
-import com.jrome.payload.JWTResponseDTO;
-import com.jrome.payload.ProductDTO;
-import com.jrome.payload.RegisterDTO;
+import com.google.gson.reflect.TypeToken;
+import com.jrome.payload.*;
+import com.jrome.utils.Input;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
-    public static void main(String[] args) throws URISyntaxException, IOException, InterruptedException {
+    public static void main(String[] args) {
 
-
-// TODO: Be able to log in as admin and save JWT token to a variable - DONE
-// TODO: Be able to add Milk and Bread to the database, providing JWT - DONE
-// TODO: Be able to register as a Customer - DONE
-// TODO: To be able to log in as a Customer and save JWT token to a variable - DONE
-// TODO: Add x3 Spears to a customers cart
-
-//       1 - Lägg till vilken produkt du än vill
-//        addProductAsAdmin(
-//                "Spear",
-//                300.0,
-//                "Throw this shit at Xerxes to make him smile forever"
-//        );
-
-
-//       2 - Skapa och registrera ny customer med användarnamn och lösenord
-//        registerCustomer("Lukas", "SpearInEyesson");
-
-//       3 - Logga in med Lukas
-//        loginCustomer("Lukas", "SpearInEyesson");
-
-
+        // TODO: Menu based program so admin and customer can make choices and take action!
+        // TODO 1: Download Lombok - DONE
+        // TODO 2: Make menus - One for admin and one for customer - DONE
+        // TODO 3: Static Input class for user inputs - DONE
+        // TODO 4: Static Output class for the frontend if needed
+        // TODO 5: Handler classes(?) for the payload class(es) so we can construct objects we need
+        // TODO 6: Place methods below in classes
+        // TODO 6.1: Make methods more dynamic, not hardcoded as they are now
+        // TODO 6.2: Better storage for JWT-Token is needed. Feels cunty to make a new login everytime
     }
 
     public static String adminLogin() throws URISyntaxException, IOException, InterruptedException {
@@ -200,5 +189,79 @@ public class Main {
         System.out.println(convertedBody);
 
         return convertedBody.getTokenType() + " " + convertedBody.getAccessToken();
+    }
+
+    public static List<ProductDTO> getAllProducts()
+            throws URISyntaxException, IOException, InterruptedException {
+        String productsURL = "http://localhost:8080/products/";
+
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpRequest getRequest = HttpRequest.newBuilder()
+                .uri(new URI(productsURL))
+                .header("Content-Type", "application/json")
+                .build();
+        HttpResponse<String> response = client.send(getRequest, HttpResponse.BodyHandlers.ofString());
+
+
+        Gson gson = new Gson();
+
+        Type products = new TypeToken<ArrayList<ProductDTO>>() {
+        }.getType();
+
+        return gson.fromJson(response.body(), products);
+    }
+
+    public static void addProductsToCart(long id, int quantity)
+            throws URISyntaxException, IOException, InterruptedException {
+
+        String addToCartURL = "http://localhost:8080/cart/" + id;
+        // Fult, hårdkodat namn och lösen för skojs skull
+        String token = loginCustomer("Lukas", "SpearInEyesson");
+
+        var quantityToCart = new ProductQuantityToCartDTO(
+                quantity
+        );
+
+        Gson gson = new Gson();
+
+        var payload = gson.toJson(quantityToCart);
+
+        HttpClient client = HttpClient.newHttpClient();
+
+
+        HttpRequest addProductRequest = HttpRequest.newBuilder()
+                .uri(new URI(addToCartURL))
+                // Detta är pissviktigt också för att säga åt att vi vill skicka i JSON och inte något annat skit
+                .header("Content-Type", "application/json")
+                // Här kommer det viktigaste. Vi måste sätta hit våran token
+                .header("Authorization", token)
+                // Själva requesten
+                .POST(HttpRequest.BodyPublishers.ofString(payload))
+                .build();
+
+        HttpResponse<String> response = client.send(addProductRequest, HttpResponse.BodyHandlers.ofString());
+
+
+    }
+
+    public static void deleteProductFromCart(long id) throws URISyntaxException, IOException, InterruptedException {
+
+        String removeItemFromCart = "http://localhost:8080/cart/" + id;
+        // Fult, hårdkodat namn och lösen för skojs skull
+        String token = loginCustomer("Lukas", "SpearInEyesson");
+
+
+        HttpClient client = HttpClient.newHttpClient();
+
+
+        HttpRequest addProductRequest = HttpRequest.newBuilder()
+                .uri(new URI(removeItemFromCart))
+                .header("Content-Type", "application/json")
+                .header("Authorization", token)
+                .DELETE()
+                .build();
+
+        HttpResponse<String> response = client.send(addProductRequest, HttpResponse.BodyHandlers.ofString());
     }
 }

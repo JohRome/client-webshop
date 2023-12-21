@@ -9,8 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginDTO {
+public class ProductQuantityToCartDTO {
 
-    private String username;
-    private String password;
+    private int quantity;
 }
