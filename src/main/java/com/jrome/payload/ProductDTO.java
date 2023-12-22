@@ -16,6 +16,7 @@ public class ProductDTO {
     private double price;
     private String description;
 
+
     @Override
     public String toString() {
         return  "\nProduct id: " + id +

@@ -2,6 +2,7 @@ package com.jrome;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.jrome.httpclient.CustomerAPI;
 import com.jrome.payload.*;
 
 import java.io.IOException;
@@ -14,24 +15,16 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Main {
-    public static void main(String[] args) {
 
-        // TODO: Menu based program so admin and customer can make choices and take action!
-        // TODO 1: Download Lombok - DONE
-        // TODO 2: Make menus - One for admin and one for customer - DONE
-        // TODO 3: Static Input class for user inputs - DONE
-        // TODO 4: Static Output class for the frontend if needed - WAIT WITH THIS
-        // TODO 5: Handler classes(?) for the payload class(es) so we can construct objects we need - WAIT WITH THIS
-        // TODO 6: Place methods below in classes
-        // TODO 6.1: Make methods more dynamic, not hardcoded as they are now
-        // TODO 6.2: Better storage for JWT-Token is needed. Feels cunty to make a new login everytime
-        // TODO: 6.3: The HttpClient.class needs to implement all of the http request methods - GET/POST/PUT/DELETE
-        // TODO: 6.3.1: Each method needs to be implemented in such way that it's as dynamical as possible
-        // TODO: 6.4: AdminAPI.class uses methods from the HttpClient.class and ONLY admin related requests
-        // TODO: 6.5: CustomerAPI.class uses methods from the HttpClient.class and ONLY customer related requests
+    public class Main {
 
-    }
+        public static void main(String[] args) throws URISyntaxException, IOException, InterruptedException {
+
+            CustomerAPI.register();
+
+        }
+
+
 
     // TODO: Need to test methods below with webshop's branch: sandra-new
 
@@ -198,26 +191,8 @@ public class Main {
         return convertedBody.getTokenType() + " " + convertedBody.getAccessToken();
     }
 
-    public static List<ProductDTO> getAllProducts()
-            throws URISyntaxException, IOException, InterruptedException {
-        String productsURL = "http://localhost:8080/products/";
-
-        HttpClient client = HttpClient.newHttpClient();
-
-        HttpRequest getRequest = HttpRequest.newBuilder()
-                .uri(new URI(productsURL))
-                .header("Content-Type", "application/json")
-                .build();
-        HttpResponse<String> response = client.send(getRequest, HttpResponse.BodyHandlers.ofString());
 
 
-        Gson gson = new Gson();
-
-        Type products = new TypeToken<ArrayList<ProductDTO>>() {
-        }.getType();
-
-        return gson.fromJson(response.body(), products);
-    }
 
     public static void addProductsToCart(long id, int quantity)
             throws URISyntaxException, IOException, InterruptedException {

@@ -9,8 +9,10 @@ public class Input {
     /**
      * At the moment this method does not validate a shit... But for testing the program out, it's fine
      */
-    public static String stringInput() {
-        return scanner.nextLine().trim();
+
+    public static String stringPut(String output) {
+        System.out.println(output);
+        return scanner.nextLine();
     }
 
 
