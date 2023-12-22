@@ -17,6 +17,7 @@ public class LoginDTO implements OneDtoToRuleThemAll {
 
     @Override
     public String toString() {
-        return "Username: " + username + "\nPassword: " + password;
+        return  "\nUsername: " + username +
+                "\nPassword: " + password;
     }
 }

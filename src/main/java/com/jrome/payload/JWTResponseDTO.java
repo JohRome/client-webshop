@@ -16,7 +16,7 @@ public class JWTResponseDTO {
 
     @Override
     public String toString() {
-        return "\nToken type: " + tokenType +
+        return  "\nToken type: " + tokenType +
                 "\nAccess Token: " + accessToken;
     }
 }

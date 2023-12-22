@@ -3,7 +3,6 @@ package com.jrome;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.jrome.payload.*;
-import com.jrome.utils.Input;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -14,9 +13,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.jrome.utils.JSONConverter.dtoToJSON;
-import static com.jrome.utils.JSONConverter.jsonToDto;
 
 public class Main {
     public static void main(String[] args) {

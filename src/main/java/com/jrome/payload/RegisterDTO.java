@@ -16,9 +16,8 @@ public class RegisterDTO {
 
     @Override
     public String toString() {
-        return "RegisterDTO{" +
-                "username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                '}';
+        return  "\nRegistration" +
+                "\nUsername: " + username +
+                "\nPassword: " + password;
     }
 }
