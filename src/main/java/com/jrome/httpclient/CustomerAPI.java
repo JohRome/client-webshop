@@ -2,8 +2,7 @@ package com.jrome.httpclient;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.jrome.payload.LoginDTO;
-import com.jrome.payload.ProductDTO;
+import com.jrome.payload.*;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -13,9 +12,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import com.jrome.payload.RegisterDTO;
 import com.jrome.utils.Input;
 
 
@@ -88,16 +87,6 @@ public class CustomerAPI {
 
 
 
-
-
-    // Product Related
-    // Exception Handler for getAllProducts. Call within try-method.
-    //             try {
-    //                List<ProductDTO> products = getAllProducts();
-    //                System.out.println(products);
-    //            } catch (URISyntaxException | IOException | InterruptedException e) {
-    //                e.printStackTrace();
-    //            }
     public static List<ProductDTO> getAllProducts()
             throws URISyntaxException, IOException, InterruptedException {
         String productsURL = "http://localhost:8080/products/";
@@ -111,11 +100,75 @@ public class CustomerAPI {
 
         HttpResponse<String> response = client.send(getRequest, HttpResponse.BodyHandlers.ofString());
 
+        int statusCode = response.statusCode();
+
+        if (statusCode == 200) {
+            Gson gson = new Gson();
+            Type productsType = new TypeToken<ArrayList<ProductDTO>>() {}.getType();
+            return gson.fromJson(response.body(), productsType);
+        } else {
+            System.out.println("Error fetching products. Status code: " + statusCode);
+            return Collections.emptyList(); // Or handle the error accordingly
+        }
+    }
+
+     // Delete product from cart
+   /** public static void deleteProductFromCart(long id) throws URISyntaxException, IOException, InterruptedException {
+
+        String removeItemFromCart = "http://localhost:8080/cart/" + id;
+        // Fult, hårdkodat namn och lösen för skojs skull
+       String token = loginCustomer("Lukas", "SpearInEyesson");
+
+
+        HttpClient client = HttpClient.newHttpClient();
+
+
+        HttpRequest addProductRequest = HttpRequest.newBuilder()
+                .uri(new URI(removeItemFromCart))
+                .header("Content-Type", "application/json")
+                .header("Authorization", token)
+                .DELETE()
+                .build();
+
+        HttpResponse<String> response = client.send(addProductRequest, HttpResponse.BodyHandlers.ofString());
+    }
+
+    // Add product to cart
+    public static void addProductsToCart(long id, int quantity)
+            throws URISyntaxException, IOException, InterruptedException {
+
+        String addToCartURL = "http://localhost:8080/cart/" + id;
+        // Fult, hårdkodat namn och lösen för skojs skull
+        //  String token = loginCustomer("Lukas", "SpearInEyesson");
+
+        var quantityToCart = new ProductQuantityToCartDTO(
+                quantity
+        );
+
         Gson gson = new Gson();
 
-        Type productsType = new TypeToken<ArrayList<ProductDTO>>() {
-        }.getType();
+        var payload = gson.toJson(quantityToCart);
 
-        return gson.fromJson(response.body(), productsType);
+        HttpClient client = HttpClient.newHttpClient();
+
+
+        HttpRequest addProductRequest = HttpRequest.newBuilder()
+                .uri(new URI(addToCartURL))
+                // Detta är pissviktigt också för att säga åt att vi vill skicka i JSON och inte något annat skit
+                .header("Content-Type", "application/json")
+                // Här kommer det viktigaste. Vi måste sätta hit våran token
+                .header("Authorization", token)
+                // Själva requesten
+                .POST(HttpRequest.BodyPublishers.ofString(payload))
+                .build();
+
+        HttpResponse<String> response = client.send(addProductRequest, HttpResponse.BodyHandlers.ofString());
+
+
     }
+
+    public static void showCart() {
+
+    }
+    **/
 }
