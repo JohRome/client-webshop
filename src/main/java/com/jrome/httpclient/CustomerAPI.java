@@ -12,21 +12,21 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import com.jrome.payload.AuthResponse;
 import com.jrome.utils.Input;
 
 
 
 public class CustomerAPI {
 
+    private String authToken; // Instance variable to store the authentication token
+    private String tokenType; // Instance variable to store the token type
 
     // Auth Related
 
-
-
-    public static void login() throws URISyntaxException, IOException, InterruptedException {
+    public void login() throws URISyntaxException, IOException, InterruptedException {
         String loginURL = "http://localhost:8080/auth/login";
 
         // Get user inputs for username and password
@@ -50,12 +50,30 @@ public class CustomerAPI {
 
         HttpResponse<String> response = client.send(loginRequest, HttpResponse.BodyHandlers.ofString());
 
-        // Handle the response as needed
-        // (e.g., parse JSON response, handle authentication token, etc.)
-        System.out.println(response.body());
+        // Print the response body along with other information
+        System.out.println("Response Body: " + response.body());
+
+        // Handle the response and save the token and token type
+        if (response.statusCode() == 200) {
+            extractAuthToken(response.body());
+            System.out.println("Login successful. AuthToken: " + authToken);
+            System.out.println("TokenType: " + tokenType);
+        } else {
+            System.out.println("Login failed. HTTP Status Code: " + response.statusCode());
+        }
     }
 
-    public static void register() throws URISyntaxException, IOException, InterruptedException {
+    private void extractAuthToken(String responseBody) {
+        Gson gson = new Gson();
+        AuthResponse authResponse = gson.fromJson(responseBody, AuthResponse.class);
+
+        // Save the token and token type to the instance variables
+        authToken = authResponse.getAccessToken();
+        tokenType = authResponse.getTokenType();
+    }
+
+
+    public void register() throws URISyntaxException, IOException, InterruptedException {
         String registerURL = "http://localhost:8080/auth/register";
 
         // Get user inputs for username and password
@@ -84,11 +102,7 @@ public class CustomerAPI {
         System.out.println(response.body());
     }
 
-
-
-
-    public static List<ProductDTO> getAllProducts()
-            throws URISyntaxException, IOException, InterruptedException {
+    public void getAllProducts() throws URISyntaxException, IOException, InterruptedException {
         String productsURL = "http://localhost:8080/products/";
 
         HttpClient client = HttpClient.newHttpClient();
@@ -105,70 +119,77 @@ public class CustomerAPI {
         if (statusCode == 200) {
             Gson gson = new Gson();
             Type productsType = new TypeToken<ArrayList<ProductDTO>>() {}.getType();
-            return gson.fromJson(response.body(), productsType);
+            gson.fromJson(response.body(), productsType);
         } else {
             System.out.println("Error fetching products. Status code: " + statusCode);
-            return Collections.emptyList(); // Or handle the error accordingly
         }
     }
 
-     // Delete product from cart
-   /** public static void deleteProductFromCart(long id) throws URISyntaxException, IOException, InterruptedException {
+    public void showCart() throws URISyntaxException, IOException, InterruptedException {
+        String cartURL = "http://localhost:8080/cart/";
 
-        String removeItemFromCart = "http://localhost:8080/cart/" + id;
-        // Fult, hårdkodat namn och lösen för skojs skull
-       String token = loginCustomer("Lukas", "SpearInEyesson");
+        // Ensure authToken is not null or empty before making the request
+        if (authToken == null || authToken.isEmpty()) {
+            System.out.println("Authentication token is missing. Please log in first.");
+            return;
+        }
 
-
+        // Send the show cart request
         HttpClient client = HttpClient.newHttpClient();
-
-
-        HttpRequest addProductRequest = HttpRequest.newBuilder()
-                .uri(new URI(removeItemFromCart))
+        HttpRequest showCartRequest = HttpRequest.newBuilder()
+                .uri(new URI(cartURL))
                 .header("Content-Type", "application/json")
-                .header("Authorization", token)
-                .DELETE()
+                .header("Authorization", authToken) // Include the authentication token in the request header
                 .build();
 
-        HttpResponse<String> response = client.send(addProductRequest, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = client.send(showCartRequest, HttpResponse.BodyHandlers.ofString());
+
+        // Handle the response as needed
+        if (response.statusCode() == 200) {
+            Gson gson = new Gson();
+            Type cartType = new TypeToken<List<ProductDTO>>() {}.getType();
+            List<ProductDTO> cartProducts = gson.fromJson(response.body(), cartType);
+
+            // Print or process the cart products
+            System.out.println("Cart Contents:");
+            for (ProductDTO product : cartProducts) {
+                System.out.println("Product ID: " + product.getId() + ", Name: " + product.getName() + ", Price: " + product.getPrice());
+            }
+        } else {
+            System.out.println("Error fetching cart. Status code: " + response.statusCode());
+            System.out.println("Response Body: " + response.body());
+        }
     }
 
-    // Add product to cart
-    public static void addProductsToCart(long id, int quantity)
-            throws URISyntaxException, IOException, InterruptedException {
+    public void addToCart(long productId) throws URISyntaxException, IOException, InterruptedException {
+        String addToCartURL = "http://localhost:8080/cart/" + productId;
 
-        String addToCartURL = "http://localhost:8080/cart/" + id;
-        // Fult, hårdkodat namn och lösen för skojs skull
-        //  String token = loginCustomer("Lukas", "SpearInEyesson");
+        // Ensure authToken is not null or empty before making the request
+        if (authToken == null || authToken.isEmpty()) {
+            System.out.println("Authentication token is missing. Please log in first.");
+            return;
+        }
 
-        var quantityToCart = new ProductQuantityToCartDTO(
-                quantity
-        );
-
-        Gson gson = new Gson();
-
-        var payload = gson.toJson(quantityToCart);
-
+        // Send the addToCart request
         HttpClient client = HttpClient.newHttpClient();
-
-
-        HttpRequest addProductRequest = HttpRequest.newBuilder()
+        HttpRequest addToCartRequest = HttpRequest.newBuilder()
                 .uri(new URI(addToCartURL))
-                // Detta är pissviktigt också för att säga åt att vi vill skicka i JSON och inte något annat skit
                 .header("Content-Type", "application/json")
-                // Här kommer det viktigaste. Vi måste sätta hit våran token
-                .header("Authorization", token)
-                // Själva requesten
-                .POST(HttpRequest.BodyPublishers.ofString(payload))
+                .header("Authorization", authToken) // Include the authentication token in the request header
+                .POST(HttpRequest.BodyPublishers.noBody()) // Assuming POST request without a request body
                 .build();
 
-        HttpResponse<String> response = client.send(addProductRequest, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = client.send(addToCartRequest, HttpResponse.BodyHandlers.ofString());
 
+        // Handle the response as needed
+        if (response.statusCode() == 200) {
+            System.out.println("Product added to the cart successfully.");
 
+            // Print the cart contents after adding the product
+            showCart();
+        } else {
+            System.out.println("Error adding product to the cart. Status code: " + response.statusCode());
+            System.out.println("Response Body: " + response.body());
+        }
     }
-
-    public static void showCart() {
-
-    }
-    **/
 }
