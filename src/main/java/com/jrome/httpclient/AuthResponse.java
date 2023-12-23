@@ -1,4 +1,4 @@
-package com.jrome.payload;
+package com.jrome.httpclient;
 
 public class AuthResponse {
     private String accessToken;

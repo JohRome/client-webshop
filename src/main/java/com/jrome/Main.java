@@ -13,7 +13,7 @@ public class Main {
     public static void main(String[] args) throws URISyntaxException, IOException, InterruptedException {
         CustomerAPI customerAPI = new CustomerAPI();
             customerAPI.login();
-            customerAPI.addToCart(Input.menuIntInput("Enter item ID to add to cart"));
+            customerAPI.checkout();
 
 
 

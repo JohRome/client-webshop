@@ -14,7 +14,7 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.jrome.payload.AuthResponse;
+import com.jrome.httpclient.AuthResponse;
 import com.jrome.utils.Input;
 
 
@@ -191,5 +191,27 @@ public class CustomerAPI {
             System.out.println("Error adding product to the cart. Status code: " + response.statusCode());
             System.out.println("Response Body: " + response.body());
         }
+    }
+
+    public void checkout() throws URISyntaxException, IOException, InterruptedException {
+        String checkoutURL = "http://localhost:8080/checkout";
+
+        // Show cart details
+        showCart();
+
+        // Continue with the checkout logic
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpRequest checkoutRequest = HttpRequest.newBuilder()
+                .uri(new URI(checkoutURL))
+                .header("Content-Type", "application/json")
+                .header("Authorization", authToken)
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .build();
+
+        HttpResponse<String> checkoutResponse = client.send(checkoutRequest, HttpResponse.BodyHandlers.ofString());
+
+        // Handle the checkout response as needed
+        System.out.println("Checkout Response: " + checkoutResponse.body());
     }
 }

@@ -2,25 +2,24 @@ package com.jrome.utils;
 
 import java.util.Scanner;
 
-
 public class Input {
+
     private static final Scanner scanner = new Scanner(System.in);
 
-    /**
-     * At the moment this method does not validate a shit... But for testing the program out, it's fine
-     */
-
-    public static String stringPut(String output) {
-        System.out.println(output);
-        return scanner.nextLine();
+    public static int intPut(String message) {
+        System.out.print(message);
+        while (!scanner.hasNextInt()) {
+            System.out.println("Invalid input. Please enter a valid integer.");
+            System.out.print(message);
+            scanner.next(); // consume the invalid input
+        }
+        int input = scanner.nextInt();
+        scanner.nextLine(); // consume the newline character
+        return input;
     }
 
-
-
-
-    public static int menuIntInput(String output) {
-        System.out.println(output);
-        return scanner.nextInt();
-
+    public static String stringPut(String message) {
+        System.out.print(message);
+        return scanner.nextLine();
     }
 }
