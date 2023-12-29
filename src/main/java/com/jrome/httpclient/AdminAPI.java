@@ -73,11 +73,9 @@ public class AdminAPI {
         // Skriv ut ProductDTO för att se att det fungerade
         System.out.println(convertedBody);
     }
-
-    public static void removeProduct(int id) {
-
+**/
     }
 
-    // Admin Related
-**/
-}
+
+
+

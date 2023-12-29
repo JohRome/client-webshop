@@ -56,7 +56,7 @@ public class CustomerAPI {
         // Handle the response and save the token and token type
         if (response.statusCode() == 200) {
             extractAuthToken(response.body());
-            System.out.println("Login successful. AuthToken: " + authToken);
+            System.out.println("Login successful.\n AuthToken: " + authToken);
             System.out.println("TokenType: " + tokenType);
         } else {
             System.out.println("Login failed. HTTP Status Code: " + response.statusCode());
@@ -119,11 +119,18 @@ public class CustomerAPI {
         if (statusCode == 200) {
             Gson gson = new Gson();
             Type productsType = new TypeToken<ArrayList<ProductDTO>>() {}.getType();
-            gson.fromJson(response.body(), productsType);
+            List<ProductDTO> products = gson.fromJson(response.body(), productsType);
+
+            // Print or process the fetched products
+            System.out.println("Fetched Products:");
+            for (ProductDTO product : products) {
+                System.out.println("Product ID: " + product.getId() + ", Name: " + product.getName() + ", Price: " + product.getPrice());
+            }
         } else {
             System.out.println("Error fetching products. Status code: " + statusCode);
         }
     }
+
 
     public void showCart() throws URISyntaxException, IOException, InterruptedException {
         String cartURL = "http://localhost:8080/cart/";
@@ -206,7 +213,7 @@ public class CustomerAPI {
                 .uri(new URI(checkoutURL))
                 .header("Content-Type", "application/json")
                 .header("Authorization", authToken)
-                .POST(HttpRequest.BodyPublishers.noBody())
+                .DELETE()
                 .build();
 
         HttpResponse<String> checkoutResponse = client.send(checkoutRequest, HttpResponse.BodyHandlers.ofString());
@@ -214,4 +221,55 @@ public class CustomerAPI {
         // Handle the checkout response as needed
         System.out.println("Checkout Response: " + checkoutResponse.body());
     }
+
+
+    public void addProductAsAdmin(String productName, double productCost, String productDesc)
+            throws URISyntaxException, IOException, InterruptedException {
+
+        String adminURL = "http://localhost:8080/products/admin";
+
+        // Ensure authToken is not null or empty before making the request
+        if (authToken == null || authToken.isEmpty()) {
+            System.out.println("Authentication token is missing. Please log in first.");
+            return;
+        }
+
+        var product = new ProductDTO();
+        product.setName(productName);
+        product.setPrice(productCost);
+        product.setDescription(productDesc);
+
+        Gson gson = new Gson();
+        String jsonProduct = gson.toJson(product);
+
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpRequest addProductRequest = HttpRequest.newBuilder()
+                .uri(URI.create(adminURL))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + authToken) // Update the format if needed
+                .POST(HttpRequest.BodyPublishers.ofString(jsonProduct))
+                .build();
+
+
+        HttpResponse<String> response = client.send(addProductRequest, HttpResponse.BodyHandlers.ofString());
+
+        // Handle the response as needed
+        if (response.statusCode() == 200) {
+            System.out.println("Product added successfully.");
+
+            // Print additional information if necessary
+            int statusCode = response.statusCode();
+            String responseBody = response.body();
+            var convertedBody = gson.fromJson(responseBody, ProductDTO.class);
+
+            System.out.println("Status Code: " + statusCode);
+            System.out.println("Converted Body: " + convertedBody);
+        } else {
+            System.out.println("Error adding product. Status code: " + response.statusCode());
+            System.out.println("Response Body: " + response.body());
+        }
+    }
+
+
 }
