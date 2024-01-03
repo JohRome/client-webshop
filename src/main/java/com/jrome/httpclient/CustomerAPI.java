@@ -26,7 +26,7 @@ public class CustomerAPI {
 
     // Auth Related
 
-    public void login() throws URISyntaxException, IOException, InterruptedException {
+    public boolean login() throws URISyntaxException, IOException, InterruptedException {
         String loginURL = "http://localhost:8080/auth/login";
 
         // Get user inputs for username and password
@@ -58,8 +58,10 @@ public class CustomerAPI {
             extractAuthToken(response.body());
             System.out.println("Login successful.\n AuthToken: " + authToken);
             System.out.println("TokenType: " + tokenType);
+            return true; // Login successful
         } else {
             System.out.println("Login failed. HTTP Status Code: " + response.statusCode());
+            return false; // Login failed
         }
     }
 
@@ -196,6 +198,38 @@ public class CustomerAPI {
             showCart();
         } else {
             System.out.println("Error adding product to the cart. Status code: " + response.statusCode());
+            System.out.println("Response Body: " + response.body());
+        }
+    }
+
+    public void removeFromCart(long productId, int quantity) throws URISyntaxException, IOException, InterruptedException {
+        String removeFromCartURL = "http://localhost:8080/cart/" + productId;
+
+        // Ensure authToken is not null or empty before making the request
+        if (authToken == null || authToken.isEmpty()) {
+            System.out.println("Authentication token is missing. Please log in first.");
+            return;
+        }
+
+        // Send the removeFromCart request
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest removeFromCartRequest = HttpRequest.newBuilder()
+                .uri(new URI(removeFromCartURL))
+                .header("Content-Type", "application/json")
+                .header("Authorization", authToken) // Include the authentication token in the request header
+                .DELETE()
+                .build();
+
+        HttpResponse<String> response = client.send(removeFromCartRequest, HttpResponse.BodyHandlers.ofString());
+
+        // Handle the response as needed
+        if (response.statusCode() == 200) {
+            System.out.println("Product removed from the cart successfully. Amount removed: "+ quantity);
+
+            // Print the cart contents after removing the product
+            showCart();
+        } else {
+            System.out.println("Error removing product from the cart. Status code: " + response.statusCode());
             System.out.println("Response Body: " + response.body());
         }
     }
