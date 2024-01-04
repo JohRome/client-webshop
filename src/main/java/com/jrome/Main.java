@@ -14,7 +14,7 @@ public class Main {
         try {
 
 
-            Menu.mainMenu();
+             Menu.mainMenu();
         } catch (URISyntaxException | IOException | InterruptedException e) {
             System.err.println("An error occurred: " + e.getMessage());
         }

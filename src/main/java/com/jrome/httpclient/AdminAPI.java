@@ -165,7 +165,7 @@ public class AdminAPI {
         }
     }
 
-    public void deleteProductAsAdmin(String id) throws URISyntaxException, InterruptedException {
+     public void deleteProductAsAdmin(String id) throws URISyntaxException, InterruptedException {
         String deleteProductURL = "http://localhost:8080/products/" + id;
 
         // Ensure authToken is not null or empty before making the request
