@@ -295,12 +295,4 @@ public class CustomerAPI {
         System.out.println(checkoutResponse.body());
     }
 
-
-    // Admin Methods
-
-    /**
-     * Adds a new product as an admin by sending a POST request with product details.
-     * Prints success message or error details.
-     */
-
 }

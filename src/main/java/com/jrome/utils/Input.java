@@ -26,7 +26,7 @@ public class Input {
     public static double doublePut(String message) {
         System.out.print(message);
         while (!scanner.hasNextInt()) {
-            System.out.println("Invalid input. Please enter a valid integer.");
+            System.out.println("Invalid input. Please enter a valid double.");
             System.out.print(message);
             scanner.next(); // consume the invalid input
         }

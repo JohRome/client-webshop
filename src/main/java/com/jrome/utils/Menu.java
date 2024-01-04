@@ -137,9 +137,10 @@ public class Menu {
             System.out.println("You are now logged in. Choose an option:");
             System.out.println("1. Show All Products");
             System.out.println("2. Add Product to Cart");
-            System.out.println("3. Show Cart");
-            System.out.println("4. Checkout");
-            System.out.println("5. Logout");
+            System.out.println("3. Remove Product from Cart");
+            System.out.println("4. Show Cart");
+            System.out.println("5. Checkout");
+            System.out.println("6. Logout");
 
             int choice = Input.intPut("Enter your choice: ");
 
