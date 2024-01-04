@@ -278,21 +278,23 @@ public class CustomerAPI {
     public void checkout() throws URISyntaxException, IOException, InterruptedException {
         String checkoutURL = "http://localhost:8080/checkout";
 
-
         HttpClient client = HttpClient.newHttpClient();
 
         HttpRequest checkoutRequest = HttpRequest.newBuilder()
                 .uri(new URI(checkoutURL))
-                .header("Accept", "text/plain;charset=UTF-8")
-                .header("Authorization", authToken)
+                .header("Content-type", "application/json")  // Adjust the content type
+                .header("Authorization", "Bearer " + authToken)
                 .DELETE()
                 .build();
+
+
 
         HttpResponse<String> checkoutResponse = client.send(checkoutRequest, HttpResponse.BodyHandlers.ofString());
 
 
-        System.out.println("Checkout Response: " + checkoutResponse.body());
+        System.out.println(checkoutResponse.body());
     }
+
 
     // Admin Methods
 
