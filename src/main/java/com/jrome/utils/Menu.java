@@ -2,7 +2,6 @@ package com.jrome.utils;
 
 import com.jrome.httpclient.CustomerAPI;
 
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -10,6 +9,9 @@ public class Menu {
 
     private static final CustomerAPI customerAPI = new CustomerAPI();
 
+    /**
+     * Main menu for the application, allowing users to choose between admin, customer, or exit options.
+     */
     public static void mainMenu() throws URISyntaxException, IOException, InterruptedException {
         while (true) {
             displayMainMenu();
@@ -35,6 +37,9 @@ public class Menu {
         }
     }
 
+    /**
+     * Admin menu, providing login, CRUD operations, and logout options.
+     */
     private static void adminMenu() throws URISyntaxException, IOException, InterruptedException {
         while (true) {
             System.out.println("\nAdmin Menu:");
@@ -49,7 +54,7 @@ public class Menu {
                     customerAPI.login();
                     break;
                 case 2:
-                    adminCRUDMenu(); // New method for CRUD operations
+                    adminCRUDMenu();
                     break;
                 case 3:
                     // Implement logout logic if needed
@@ -60,6 +65,9 @@ public class Menu {
         }
     }
 
+    /**
+     * Admin CRUD menu, providing options for adding, updating, and deleting products.
+     */
     private static void adminCRUDMenu() throws URISyntaxException, IOException, InterruptedException {
         while (true) {
             System.out.println("\nAdmin CRUD Menu:");
@@ -72,16 +80,15 @@ public class Menu {
 
             switch (choice) {
                 case 1:
-                    // Implement logic to add a product
-                    customerAPI.addProductAsAdmin(Input.stringPut("Enter Product Name: "), Input.intPut("Enter Product Cost: "), Input.stringPut("Enter Product Description: "));
+                    customerAPI.addProductAsAdmin(Input.stringPut("Enter Product Name: "),
+                            Input.intPut("Enter Product Cost: "),
+                            Input.stringPut("Enter Product Description: "));
                     break;
                 case 2:
                     // Implement logic to update a product
-                    // customerAPI.updateProductAsAdmin()
                     break;
                 case 3:
                     // Implement logic to delete a product
-                    // customerAPI.deleteProductAsAdmin()
                     break;
                 case 4:
                     return; // Back to Admin Menu
@@ -91,8 +98,9 @@ public class Menu {
         }
     }
 
-
-
+    /**
+     * Customer menu, allowing login, registration, and various product-related operations.
+     */
     private static void customerMenu() throws URISyntaxException, IOException, InterruptedException {
         boolean loggedIn = false;
 
@@ -112,7 +120,7 @@ public class Menu {
                         loggedIn = customerAPI.login();
                         break;
                     case 2:
-                         customerAPI.register();
+                        customerAPI.register();
                         break;
                     case 3:
                         return; // Back to Main Menu
@@ -125,7 +133,6 @@ public class Menu {
                 }
             }
 
-            // Once logged in, display CRUD options
             System.out.println("You are now logged in. Choose an option:");
             System.out.println("1. Show All Products");
             System.out.println("2. Add Product to Cart");
@@ -159,6 +166,9 @@ public class Menu {
         }
     }
 
+    /**
+     * Displays all products available.
+     */
     private static void showAllProducts() {
         try {
             customerAPI.getAllProducts();
@@ -167,6 +177,9 @@ public class Menu {
         }
     }
 
+    /**
+     * Displays the main menu options.
+     */
     private static void displayMainMenu() {
         System.out.println("\nMain Menu:");
         System.out.println("1. Continue as Admin");
@@ -175,6 +188,10 @@ public class Menu {
         System.out.println("4. Exit Program");
     }
 
+    /**
+     * Displays an error message.
+     * @param message The error message to be displayed.
+     */
     private static void displayError(String message) {
         System.out.println("Error: " + message);
     }
