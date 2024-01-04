@@ -149,17 +149,18 @@ public class Menu {
                     showAllProducts();
                     break;
                 case 2:
-                    long productId = Input.intPut("Enter the product ID to add to the cart: ");
-                    int productQty = Input.intPut("Enter the amount you want to add to the cart: ");
-                    customerAPI.addToCart(productId, productQty);
+
+                    customerAPI.addToCart(Input.intPut("Enter the product ID to add to the cart: "), Input.intPut("Enter the amount you want to add to the cart: "));
                     break;
                 case 3:
+                    customerAPI.removeFromCart(Input.intPut("Enter the product ID from an item in your cart: "), Input.intPut("Enter the amount you wish to remove: "));
+                case 4:
                     customerAPI.showCart();
                     break;
-                case 4:
+                case 5:
                     customerAPI.checkout();
                     break;
-                case 5:
+                case 6:
                     loggedIn = false; // Logout
                     return;
                 default:

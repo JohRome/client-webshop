@@ -249,12 +249,15 @@ public class CustomerAPI {
             return;
         }
 
-        // Send the removeFromCart request
+        // Create a JSON body with the specified quantity
+        String requestBody = "{\"quantity\":" + quantity + "}";
+
+        // Send the removeFromCart request with the JSON body
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest removeFromCartRequest = HttpRequest.newBuilder()
                 .uri(new URI(removeFromCartURL))
                 .header("Content-Type", "application/json")
-                .header("Authorization", authToken)
+                .header("Authorization", "Bearer " + authToken)
                 .DELETE()
                 .build();
 
@@ -262,7 +265,7 @@ public class CustomerAPI {
 
         // Handle the response as needed
         if (response.statusCode() == 200) {
-            System.out.println("Product removed from the cart successfully. Amount removed: "+ quantity);
+            System.out.println("Product removed from the cart successfully. Amount removed: " + quantity);
         } else {
             System.out.println("Error removing product from the cart. Status code: " + response.statusCode());
             System.out.println("Response Body: " + response.body());
