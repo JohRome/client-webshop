@@ -17,30 +17,31 @@ import java.util.List;
 import com.jrome.httpclient.AuthResponse;
 import com.jrome.utils.Input;
 
-
-
 public class CustomerAPI {
 
-    private String authToken; // Instance variable to store the authentication token
-    private String tokenType; // Instance variable to store the token type
+    private String authToken;
+    private String tokenType;
 
-    // Auth Related
+    // Authentication Methods
 
+    /**
+     * Attempts to log in the user by sending a POST request with login credentials.
+     * If successful, stores the authentication token and token type.
+     * @return true if login is successful, false otherwise.
+     */
     public boolean login() throws URISyntaxException, IOException, InterruptedException {
         String loginURL = "http://localhost:8080/auth/login";
 
-        // Get user inputs for username and password
+        // Collect user credentials
         String username = Input.stringPut("Enter your username: ");
         String password = Input.stringPut("Enter your password: ");
 
-        // Create a LoginDTO object
+        // Create LoginDTO object and convert to JSON
         var loginCredentials = new LoginDTO(username, password);
-
-        // Convert the LoginDTO to JSON
         Gson gson = new Gson();
         String jsonLoginCredentials = gson.toJson(loginCredentials);
 
-        // Send the login request
+        // Send login request
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest loginRequest = HttpRequest.newBuilder()
                 .uri(new URI(loginURL))
@@ -50,45 +51,47 @@ public class CustomerAPI {
 
         HttpResponse<String> response = client.send(loginRequest, HttpResponse.BodyHandlers.ofString());
 
-
-
-        // Handle the response and save the token and token type
+        // Handle the response
         if (response.statusCode() == 200) {
             extractAuthToken(response.body());
             System.out.println("\nLogin successful.\n");
-
-            return true; // Login successful
+            return true;
         } else {
             System.out.println("Login failed. HTTP Status Code: " + response.statusCode());
-            return false; // Login failed
+            return false;
         }
     }
 
+    /**
+     * Extracts the authentication token and token type from the login response.
+     * @param responseBody The response body containing authentication information.
+     */
     private void extractAuthToken(String responseBody) {
         Gson gson = new Gson();
         AuthResponse authResponse = gson.fromJson(responseBody, AuthResponse.class);
 
-        // Save the token and token type to the instance variables
+        // Save the token and token type
         authToken = authResponse.getAccessToken();
         tokenType = authResponse.getTokenType();
     }
 
-
+    /**
+     * Registers a new user by sending a POST request with registration credentials.
+     * Prints the response body after registration.
+     */
     public void register() throws URISyntaxException, IOException, InterruptedException {
         String registerURL = "http://localhost:8080/auth/register";
 
-        // Get user inputs for username and password
+        // Collect user credentials
         String username = Input.stringPut("Enter your username: ");
         String password = Input.stringPut("Enter your password: ");
 
-        // Create a RegisterDTO object
+        // Create RegisterDTO object and convert to JSON
         var registerCredentials = new RegisterDTO(username, password);
-
-        // Convert the RegisterDTO to JSON
         Gson gson = new Gson();
         String jsonRegisterCredentials = gson.toJson(registerCredentials);
 
-        // Send the register request
+        // Send register request
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest registerRequest = HttpRequest.newBuilder()
                 .uri(new URI(registerURL))
@@ -98,11 +101,16 @@ public class CustomerAPI {
 
         HttpResponse<String> response = client.send(registerRequest, HttpResponse.BodyHandlers.ofString());
 
-        // Handle the response as needed
-        // (e.g., parse JSON response, handle registration success/failure, etc.)
+        // Print the registration response
         System.out.println(response.body());
     }
 
+    // Product Methods
+
+    /**
+     * Retrieves all products by sending a GET request to the products endpoint.
+     * Prints the details of fetched products.
+     */
     public void getAllProducts() throws URISyntaxException, IOException, InterruptedException {
         String productsURL = "http://localhost:8080/products/";
 
@@ -132,7 +140,12 @@ public class CustomerAPI {
         }
     }
 
+    // Cart Methods
 
+    /**
+     * Displays the contents of the user's cart by sending a GET request with proper authorization.
+     * Prints the cart contents or an error message if the token is missing.
+     */
     public void showCart() throws URISyntaxException, IOException, InterruptedException {
         String cartURL = "http://localhost:8080/cart/";
 
@@ -142,14 +155,13 @@ public class CustomerAPI {
             return;
         }
 
-
         // Send the show cart request using a GET request
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest showCartRequest = HttpRequest.newBuilder()
                 .uri(new URI(cartURL))
                 .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + authToken) // Include the authentication token in the request header
-                .GET() // Change to GET request
+                .header("Authorization", "Bearer " + authToken)
+                .GET()
                 .build();
 
         HttpResponse<String> response = client.send(showCartRequest, HttpResponse.BodyHandlers.ofString());
@@ -164,10 +176,10 @@ public class CustomerAPI {
         }
     }
 
-
-
-
-
+    /**
+     * Adds a product to the user's cart by sending a POST request with product ID and quantity.
+     * Prints success message or error details.
+     */
     public void addToCart(long productId, int quantity) throws URISyntaxException, IOException, InterruptedException {
         String addToCartURL = "http://localhost:8080/cart/" + productId;
 
@@ -177,8 +189,6 @@ public class CustomerAPI {
             return;
         }
 
-
-
         // Create a JSON body with the specified quantity
         String requestBody = "{\"quantity\":" + quantity + "}";
 
@@ -187,7 +197,7 @@ public class CustomerAPI {
         HttpRequest addToCartRequest = HttpRequest.newBuilder()
                 .uri(new URI(addToCartURL))
                 .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + authToken) // Include the authentication token in the request header
+                .header("Authorization", "Bearer " + authToken)
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
 
@@ -196,16 +206,16 @@ public class CustomerAPI {
         // Handle the response as needed
         if (response.statusCode() == 200) {
             System.out.println("Product added to the cart successfully.");
-
-
         } else {
             System.out.println("Error adding product to the cart. Status code: " + response.statusCode());
             System.out.println("Response Body: " + response.body());
         }
     }
 
-
-
+    /**
+     * Removes a product from the user's cart by sending a DELETE request with product ID.
+     * Prints success message or error details.
+     */
     public void removeFromCart(long productId, int quantity) throws URISyntaxException, IOException, InterruptedException {
         String removeFromCartURL = "http://localhost:8080/cart/" + productId;
 
@@ -220,7 +230,7 @@ public class CustomerAPI {
         HttpRequest removeFromCartRequest = HttpRequest.newBuilder()
                 .uri(new URI(removeFromCartURL))
                 .header("Content-Type", "application/json")
-                .header("Authorization", authToken) // Include the authentication token in the request header
+                .header("Authorization", authToken)
                 .DELETE()
                 .build();
 
@@ -229,17 +239,20 @@ public class CustomerAPI {
         // Handle the response as needed
         if (response.statusCode() == 200) {
             System.out.println("Product removed from the cart successfully. Amount removed: "+ quantity);
-
-
         } else {
             System.out.println("Error removing product from the cart. Status code: " + response.statusCode());
             System.out.println("Response Body: " + response.body());
         }
     }
 
+    // Checkout Method
+
+    /**
+     * Initiates the checkout process by sending a DELETE request to the checkout endpoint.
+     * Prints the response body after checkout.
+     */
     public void checkout() throws URISyntaxException, IOException, InterruptedException {
         String checkoutURL = "http://localhost:8080/checkout";
-
 
         // Continue with the checkout logic
         HttpClient client = HttpClient.newHttpClient();
@@ -257,7 +270,12 @@ public class CustomerAPI {
         System.out.println("Checkout Response: " + checkoutResponse.body());
     }
 
+    // Admin Methods
 
+    /**
+     * Adds a new product as an admin by sending a POST request with product details.
+     * Prints success message or error details.
+     */
     public void addProductAsAdmin(String productName, double productCost, String productDesc)
             throws URISyntaxException, IOException, InterruptedException {
 
@@ -269,6 +287,7 @@ public class CustomerAPI {
             return;
         }
 
+        // Create a product object and convert to JSON
         var product = new ProductDTO();
         product.setName(productName);
         product.setPrice(productCost);
@@ -279,13 +298,13 @@ public class CustomerAPI {
 
         HttpClient client = HttpClient.newHttpClient();
 
+        // Send the addProduct request
         HttpRequest addProductRequest = HttpRequest.newBuilder()
                 .uri(URI.create(adminURL))
                 .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + authToken) // Update the format if needed
+                .header("Authorization", "Bearer " + authToken)
                 .POST(HttpRequest.BodyPublishers.ofString(jsonProduct))
                 .build();
-
 
         HttpResponse<String> response = client.send(addProductRequest, HttpResponse.BodyHandlers.ofString());
 
@@ -305,6 +324,4 @@ public class CustomerAPI {
             System.out.println("Response Body: " + response.body());
         }
     }
-
-
 }
