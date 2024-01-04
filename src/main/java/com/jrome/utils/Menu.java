@@ -35,25 +35,63 @@ public class Menu {
         }
     }
 
-    private static void adminMenu() {
+    private static void adminMenu() throws URISyntaxException, IOException, InterruptedException {
         while (true) {
             System.out.println("\nAdmin Menu:");
-            System.out.println("1. CRUD Product List");
-            System.out.println("2. Logout");
+            System.out.println("1. Login");
+            System.out.println("2. CRUD Product List");
+            System.out.println("3. Logout");
 
             int choice = Input.intPut("Enter your choice: ");
 
             switch (choice) {
                 case 1:
-                    System.out.println("This is where CRUD operations will be performed.");
+                    customerAPI.login();
                     break;
                 case 2:
+                    adminCRUDMenu(); // New method for CRUD operations
+                    break;
+                case 3:
+                    // Implement logout logic if needed
                     return;
                 default:
                     displayError("Invalid choice. Please try again.");
             }
         }
     }
+
+    private static void adminCRUDMenu() throws URISyntaxException, IOException, InterruptedException {
+        while (true) {
+            System.out.println("\nAdmin CRUD Menu:");
+            System.out.println("1. Add Product");
+            System.out.println("2. Update Product");
+            System.out.println("3. Delete Product");
+            System.out.println("4. Back to Admin Menu");
+
+            int choice = Input.intPut("Enter your choice: ");
+
+            switch (choice) {
+                case 1:
+                    // Implement logic to add a product
+                    customerAPI.addProductAsAdmin(Input.stringPut("Enter Product Name: "), Input.intPut("Enter Product Cost: "), Input.stringPut("Enter Product Description: "));
+                    break;
+                case 2:
+                    // Implement logic to update a product
+                    // customerAPI.updateProductAsAdmin()
+                    break;
+                case 3:
+                    // Implement logic to delete a product
+                    // customerAPI.deleteProductAsAdmin()
+                    break;
+                case 4:
+                    return; // Back to Admin Menu
+                default:
+                    displayError("Invalid choice. Please try again.");
+            }
+        }
+    }
+
+
 
     private static void customerMenu() throws URISyntaxException, IOException, InterruptedException {
         boolean loggedIn = false;
@@ -102,8 +140,9 @@ public class Menu {
                     showAllProducts();
                     break;
                 case 2:
-                    long productId = Input.intPut("Enter the product ID to add to the cart:");
-                    customerAPI.addToCart(productId);
+                    long productId = Input.intPut("Enter the product ID to add to the cart: ");
+                    int productQty = Input.intPut("Enter the amount you want to add to the cart: ");
+                    customerAPI.addToCart(productId, productQty);
                     break;
                 case 3:
                     customerAPI.showCart();

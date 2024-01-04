@@ -50,14 +50,13 @@ public class CustomerAPI {
 
         HttpResponse<String> response = client.send(loginRequest, HttpResponse.BodyHandlers.ofString());
 
-        // Print the response body along with other information
-        System.out.println("Response Body: " + response.body());
+
 
         // Handle the response and save the token and token type
         if (response.statusCode() == 200) {
             extractAuthToken(response.body());
-            System.out.println("Login successful.\n AuthToken: " + authToken);
-            System.out.println("TokenType: " + tokenType);
+            System.out.println("\nLogin successful.\n");
+
             return true; // Login successful
         } else {
             System.out.println("Login failed. HTTP Status Code: " + response.statusCode());
@@ -143,34 +142,33 @@ public class CustomerAPI {
             return;
         }
 
-        // Send the show cart request
+
+        // Send the show cart request using a GET request
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest showCartRequest = HttpRequest.newBuilder()
                 .uri(new URI(cartURL))
                 .header("Content-Type", "application/json")
-                .header("Authorization", authToken) // Include the authentication token in the request header
+                .header("Authorization", "Bearer " + authToken) // Include the authentication token in the request header
+                .GET() // Change to GET request
                 .build();
 
         HttpResponse<String> response = client.send(showCartRequest, HttpResponse.BodyHandlers.ofString());
 
         // Handle the response as needed
         if (response.statusCode() == 200) {
-            Gson gson = new Gson();
-            Type cartType = new TypeToken<List<ProductDTO>>() {}.getType();
-            List<ProductDTO> cartProducts = gson.fromJson(response.body(), cartType);
-
-            // Print or process the cart products
-            System.out.println("Cart Contents:");
-            for (ProductDTO product : cartProducts) {
-                System.out.println("Product ID: " + product.getId() + ", Name: " + product.getName() + ", Price: " + product.getPrice());
-            }
+            // Print or process the cart products directly from the response body
+            System.out.println("Cart Contents:\n" + response.body());
         } else {
             System.out.println("Error fetching cart. Status code: " + response.statusCode());
             System.out.println("Response Body: " + response.body());
         }
     }
 
-    public void addToCart(long productId) throws URISyntaxException, IOException, InterruptedException {
+
+
+
+
+    public void addToCart(long productId, int quantity) throws URISyntaxException, IOException, InterruptedException {
         String addToCartURL = "http://localhost:8080/cart/" + productId;
 
         // Ensure authToken is not null or empty before making the request
@@ -179,13 +177,18 @@ public class CustomerAPI {
             return;
         }
 
-        // Send the addToCart request
+
+
+        // Create a JSON body with the specified quantity
+        String requestBody = "{\"quantity\":" + quantity + "}";
+
+        // Send the addToCart request with the JSON body
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest addToCartRequest = HttpRequest.newBuilder()
                 .uri(new URI(addToCartURL))
                 .header("Content-Type", "application/json")
-                .header("Authorization", authToken) // Include the authentication token in the request header
-                .POST(HttpRequest.BodyPublishers.noBody()) // Assuming POST request without a request body
+                .header("Authorization", "Bearer " + authToken) // Include the authentication token in the request header
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
 
         HttpResponse<String> response = client.send(addToCartRequest, HttpResponse.BodyHandlers.ofString());
@@ -194,13 +197,14 @@ public class CustomerAPI {
         if (response.statusCode() == 200) {
             System.out.println("Product added to the cart successfully.");
 
-            // Print the cart contents after adding the product
-            showCart();
+
         } else {
             System.out.println("Error adding product to the cart. Status code: " + response.statusCode());
             System.out.println("Response Body: " + response.body());
         }
     }
+
+
 
     public void removeFromCart(long productId, int quantity) throws URISyntaxException, IOException, InterruptedException {
         String removeFromCartURL = "http://localhost:8080/cart/" + productId;
@@ -226,8 +230,7 @@ public class CustomerAPI {
         if (response.statusCode() == 200) {
             System.out.println("Product removed from the cart successfully. Amount removed: "+ quantity);
 
-            // Print the cart contents after removing the product
-            showCart();
+
         } else {
             System.out.println("Error removing product from the cart. Status code: " + response.statusCode());
             System.out.println("Response Body: " + response.body());
@@ -237,8 +240,6 @@ public class CustomerAPI {
     public void checkout() throws URISyntaxException, IOException, InterruptedException {
         String checkoutURL = "http://localhost:8080/checkout";
 
-        // Show cart details
-        showCart();
 
         // Continue with the checkout logic
         HttpClient client = HttpClient.newHttpClient();
