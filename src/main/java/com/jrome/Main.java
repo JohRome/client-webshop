@@ -23,12 +23,6 @@ public class Main {
 
 
 
-        // CustomerAPI.addToCart(id""); // IMPLEMENTED, since we have errors fetching cart and using it, there are still issues. Backend-problem?
-
-        // CustomerAPI.showCart(); // IMPLEMENTED, error fetching cart. Backend-problem?
-
-        // CustomerAPI.login(); // Implemented, now saves the authtoken throughout the program.
-        // CustomerAPI.addProductAsAdmin() // IMPLEMENTED
 
 
 

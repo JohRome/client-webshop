@@ -42,7 +42,8 @@ public class Menu {
      * Admin menu, providing login, CRUD operations, and logout options.
      */
     private static void adminMenu() throws URISyntaxException, IOException, InterruptedException {
-        while (true) {
+            boolean aLoggedIn = false;
+        outerLoop: while (true) {
             System.out.println("\nAdmin Menu:");
             System.out.println("1. Login");
             System.out.println("2. CRUD Product List");
@@ -52,14 +53,21 @@ public class Menu {
 
             switch (choice) {
                 case 1:
-                    adminAPI.login();
+                   aLoggedIn = adminAPI.login();
                     break;
                 case 2:
-                    adminCRUDMenu();
-                    break;
+                    if(aLoggedIn) {
+                        adminCRUDMenu();
+                        break;
+                    }else {
+                        System.out.println("\nYou have to be logged in as an Admin to be able to reach AdminCrudMenu.");
+                        continue;
+                    }
+
                 case 3:
-                    // Implement logout logic if needed
-                    return;
+                    aLoggedIn = false; // Logout
+                    break outerLoop;
+
                 default:
                     displayError("Invalid choice. Please try again.");
             }
@@ -103,12 +111,12 @@ public class Menu {
      * Customer menu, allowing login, registration, and various product-related operations.
      */
     private static void customerMenu() throws URISyntaxException, IOException, InterruptedException {
-        boolean loggedIn = false;
+        boolean cLoggedIn = false;
 
-        while (true) {
+       outerLoop: while (true) {
             System.out.println("\nCustomer Menu:");
 
-            if (!loggedIn) {
+            if (!cLoggedIn) {
                 System.out.println("You need to log in or register first:");
                 System.out.println("1. Log In");
                 System.out.println("2. Register");
@@ -118,7 +126,7 @@ public class Menu {
 
                 switch (loginChoice) {
                     case 1:
-                        loggedIn = customerAPI.login();
+                        cLoggedIn = customerAPI.login();
                         break;
                     case 2:
                         customerAPI.register();
@@ -129,7 +137,7 @@ public class Menu {
                         displayError("Invalid choice. Please try again.");
                 }
 
-                if (!loggedIn) {
+                if (!cLoggedIn) {
                     continue; // Re-display Customer Menu if login or register fails
                 }
             }
@@ -161,8 +169,8 @@ public class Menu {
                     customerAPI.checkout();
                     break;
                 case 6:
-                    loggedIn = false; // Logout
-                    return;
+                    cLoggedIn = false; // Logout
+                    break outerLoop;
                 default:
                     displayError("Invalid choice. Please try again.");
             }

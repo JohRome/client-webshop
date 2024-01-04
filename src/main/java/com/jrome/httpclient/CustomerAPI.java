@@ -22,7 +22,7 @@ public class CustomerAPI {
     private String authToken;
     private String tokenType;
 
-    private boolean isCustomerLoggedIn = false;
+
 
     // Authentication Methods
 
@@ -34,11 +34,6 @@ public class CustomerAPI {
     public boolean login() throws URISyntaxException, IOException, InterruptedException {
         String loginURL = "http://localhost:8080/auth/login";
 
-        // Check if the user is already logged in
-        if (isCustomerLoggedIn) {
-            System.out.println("You are already logged in.");
-            return false;
-        }
 
         // Collect user credentials
         String username = Input.stringPut("Enter your username: ");
@@ -65,7 +60,6 @@ public class CustomerAPI {
             System.out.println("\nLogin successful.\n");
             System.out.println(authToken);
 
-            isCustomerLoggedIn = true;  // Set the login status
 
             return true;
         } else {
@@ -80,9 +74,7 @@ public class CustomerAPI {
      * Checks if a customer is logged in.
      * @return true if a customer is logged in, false otherwise.
      */
-    public boolean isCustomerLoggedIn() {
-        return isCustomerLoggedIn;
-    }
+
 
     // Other methods...
 

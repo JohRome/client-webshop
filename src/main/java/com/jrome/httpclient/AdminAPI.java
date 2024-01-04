@@ -16,7 +16,7 @@ public class AdminAPI {
 
     private String authToken;
     private String tokenType;
-    private boolean isAdminLoggedIn = false;
+
 
     // ... (unchanged methods)
 
@@ -24,14 +24,11 @@ public class AdminAPI {
      * Attempts to log in the admin by sending a POST request with login credentials.
      * If successful, stores the authentication token.
      */
-    public void login() throws URISyntaxException, IOException, InterruptedException {
+    public boolean login() throws URISyntaxException, IOException, InterruptedException {
         String loginURL = "http://localhost:8080/auth/login";
 
         // Check if the admin is already logged in
-        if (isAdminLoggedIn) {
-            System.out.println("You are already logged in.");
-            return;
-        }
+
 
         // Collect admin credentials
         String username = Input.stringPut("Enter your username: ");
@@ -57,10 +54,12 @@ public class AdminAPI {
             extractAuthToken(response.body());
             System.out.println("\nLogin successful.\n");
             System.out.println(authToken);
-            isAdminLoggedIn = true;  // Set the login status
+
+            return true;
         } else {
             System.out.println("Login failed. HTTP Status Code: " + response.statusCode());
         }
+        return false;
     }
     private void extractAuthToken(String responseBody) {
         Gson gson = new Gson();
@@ -122,10 +121,7 @@ public class AdminAPI {
 
 
     public void updateProductAsAdmin(String id) throws URISyntaxException, IOException, InterruptedException {
-        if (!isAdminLoggedIn) {
-            System.out.println("You need to log in as an admin first.");
-            return;
-        }
+
 
         // Collect updated product details
         String name = Input.stringPut("Enter the updated product name: ");
