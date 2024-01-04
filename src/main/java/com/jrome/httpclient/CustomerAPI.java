@@ -22,6 +22,8 @@ public class CustomerAPI {
     private String authToken;
     private String tokenType;
 
+    private boolean isCustomerLoggedIn = false;
+
     // Authentication Methods
 
     /**
@@ -31,6 +33,12 @@ public class CustomerAPI {
      */
     public boolean login() throws URISyntaxException, IOException, InterruptedException {
         String loginURL = "http://localhost:8080/auth/login";
+
+        // Check if the user is already logged in
+        if (isCustomerLoggedIn) {
+            System.out.println("You are already logged in.");
+            return false;
+        }
 
         // Collect user credentials
         String username = Input.stringPut("Enter your username: ");
@@ -55,12 +63,28 @@ public class CustomerAPI {
         if (response.statusCode() == 200) {
             extractAuthToken(response.body());
             System.out.println("\nLogin successful.\n");
+            System.out.println(authToken);
+
+            isCustomerLoggedIn = true;  // Set the login status
+
             return true;
         } else {
             System.out.println("Login failed. HTTP Status Code: " + response.statusCode());
             return false;
         }
     }
+
+
+
+    /**
+     * Checks if a customer is logged in.
+     * @return true if a customer is logged in, false otherwise.
+     */
+    public boolean isCustomerLoggedIn() {
+        return isCustomerLoggedIn;
+    }
+
+    // Other methods...
 
     /**
      * Extracts the authentication token and token type from the login response.
@@ -254,20 +278,20 @@ public class CustomerAPI {
     public void checkout() throws URISyntaxException, IOException, InterruptedException {
         String checkoutURL = "http://localhost:8080/checkout";
 
-        // Continue with the checkout logic
+
         HttpClient client = HttpClient.newHttpClient();
 
         HttpRequest checkoutRequest = HttpRequest.newBuilder()
                 .uri(new URI(checkoutURL))
-                .header("Content-Type", "application/json")
+                .header("Content-Type", "text/plain")
                 .header("Authorization", authToken)
                 .DELETE()
                 .build();
 
         HttpResponse<String> checkoutResponse = client.send(checkoutRequest, HttpResponse.BodyHandlers.ofString());
 
-        // Handle the checkout response as needed
-        System.out.println("Checkout Response: " + checkoutResponse.body());
+
+        System.out.println("Checkout Response: " + HttpResponse.BodyHandlers.discarding());
     }
 
     // Admin Methods
@@ -276,52 +300,5 @@ public class CustomerAPI {
      * Adds a new product as an admin by sending a POST request with product details.
      * Prints success message or error details.
      */
-    public void addProductAsAdmin(String productName, double productCost, String productDesc)
-            throws URISyntaxException, IOException, InterruptedException {
 
-        String adminURL = "http://localhost:8080/products/admin";
-
-        // Ensure authToken is not null or empty before making the request
-        if (authToken == null || authToken.isEmpty()) {
-            System.out.println("Authentication token is missing. Please log in first.");
-            return;
-        }
-
-        // Create a product object and convert to JSON
-        var product = new ProductDTO();
-        product.setName(productName);
-        product.setPrice(productCost);
-        product.setDescription(productDesc);
-
-        Gson gson = new Gson();
-        String jsonProduct = gson.toJson(product);
-
-        HttpClient client = HttpClient.newHttpClient();
-
-        // Send the addProduct request
-        HttpRequest addProductRequest = HttpRequest.newBuilder()
-                .uri(URI.create(adminURL))
-                .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + authToken)
-                .POST(HttpRequest.BodyPublishers.ofString(jsonProduct))
-                .build();
-
-        HttpResponse<String> response = client.send(addProductRequest, HttpResponse.BodyHandlers.ofString());
-
-        // Handle the response as needed
-        if (response.statusCode() == 200) {
-            System.out.println("Product added successfully.");
-
-            // Print additional information if necessary
-            int statusCode = response.statusCode();
-            String responseBody = response.body();
-            var convertedBody = gson.fromJson(responseBody, ProductDTO.class);
-
-            System.out.println("Status Code: " + statusCode);
-            System.out.println("Converted Body: " + convertedBody);
-        } else {
-            System.out.println("Error adding product. Status code: " + response.statusCode());
-            System.out.println("Response Body: " + response.body());
-        }
-    }
 }

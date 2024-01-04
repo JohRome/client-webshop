@@ -1,13 +1,14 @@
 package com.jrome.utils;
 
 import com.jrome.httpclient.CustomerAPI;
-
+import com.jrome.httpclient.AdminAPI;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
 public class Menu {
 
     private static final CustomerAPI customerAPI = new CustomerAPI();
+    private static final AdminAPI adminAPI = new AdminAPI();
 
     /**
      * Main menu for the application, allowing users to choose between admin, customer, or exit options.
@@ -51,7 +52,7 @@ public class Menu {
 
             switch (choice) {
                 case 1:
-                    customerAPI.login();
+                    adminAPI.login();
                     break;
                 case 2:
                     adminCRUDMenu();
@@ -80,15 +81,15 @@ public class Menu {
 
             switch (choice) {
                 case 1:
-                    customerAPI.addProductAsAdmin(Input.stringPut("Enter Product Name: "),
+                    adminAPI.addProductAsAdmin(Input.stringPut("Enter Product Name: "),
                             Input.intPut("Enter Product Cost: "),
                             Input.stringPut("Enter Product Description: "));
                     break;
                 case 2:
-                    // Implement logic to update a product
+                    adminAPI.updateProductAsAdmin(Input.stringPut("Enter Product ID:"));// Implement logic to update a product
                     break;
                 case 3:
-                    // Implement logic to delete a product
+                    adminAPI.deleteProductAsAdmin(Input.stringPut("Enter Product ID: "));// Implement logic to delete a product
                     break;
                 case 4:
                     return; // Back to Admin Menu
