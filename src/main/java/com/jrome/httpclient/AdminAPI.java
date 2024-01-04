@@ -165,7 +165,36 @@ public class AdminAPI {
         }
     }
 
-    public void deleteProductAsAdmin(String id) {
+    public void deleteProductAsAdmin(String id) throws URISyntaxException, InterruptedException {
+        String deleteProductURL = "http://localhost:8080/products/" + id;
 
+        // Ensure authToken is not null or empty before making the request
+        if (authToken == null || authToken.isEmpty()) {
+            System.out.println("Authentication token is missing. Please log in first.");
+            return;
+        }
+
+        // Send the deleteProduct request
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest deleteProductRequest = HttpRequest.newBuilder()
+                .uri(new URI(deleteProductURL))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + authToken)
+                .DELETE()
+                .build();
+
+        try {
+            HttpResponse<String> response = client.send(deleteProductRequest, HttpResponse.BodyHandlers.ofString());
+
+            // Handle the response status
+            if (response.statusCode() == 200) {
+                System.out.println("Product deleted successfully.");
+            } else {
+                System.out.println("Error deleting product. Status code: " + response.statusCode());
+                System.out.println("Response Body: " + response.body());
+            }
+        } catch (Exception e) {
+            System.out.println("An error occurred: " + e.getMessage());
+        }
     }
 }

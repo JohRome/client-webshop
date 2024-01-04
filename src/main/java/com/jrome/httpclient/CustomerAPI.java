@@ -283,7 +283,7 @@ public class CustomerAPI {
 
         HttpRequest checkoutRequest = HttpRequest.newBuilder()
                 .uri(new URI(checkoutURL))
-                .header("Content-Type", "text/plain")
+                .header("Accept", "text/plain;charset=UTF-8")
                 .header("Authorization", authToken)
                 .DELETE()
                 .build();
@@ -291,7 +291,7 @@ public class CustomerAPI {
         HttpResponse<String> checkoutResponse = client.send(checkoutRequest, HttpResponse.BodyHandlers.ofString());
 
 
-        System.out.println("Checkout Response: " + HttpResponse.BodyHandlers.discarding());
+        System.out.println("Checkout Response: " + checkoutResponse.body());
     }
 
     // Admin Methods
