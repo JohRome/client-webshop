@@ -23,7 +23,7 @@ public class AdminAPI {
     private String tokenType;
 
 
-    // ... (unchanged methods)
+
 
     /**
      * Attempts to log in the admin by sending a POST request with login credentials.
@@ -171,7 +171,7 @@ public class AdminAPI {
         // Fetch all products
         List<ProductDTO> allProducts = getAllProducts();
 
-        // Assuming getId() returns a primitive type (e.g., long)
+
         boolean productExists = allProducts.stream().anyMatch(product -> product.getId() == Long.parseLong(id));
 
         if (!productExists) {
@@ -213,14 +213,7 @@ public class AdminAPI {
     }
 
     // Helper method to fetch all products
-    public void displayAllProducts(List<ProductDTO> products) {
-        for (ProductDTO product : products) {
-            System.out.println("\nProduct id: " + product.getId());
-            System.out.println("Product name: " + product.getName());
-            System.out.println("Product price: " + product.getPrice());
-            System.out.println("Product description: " + product.getDescription());
-        }
-    }
+
 
     public List<ProductDTO> getAllProducts() throws URISyntaxException, IOException, InterruptedException {
         String productsURL = "http://localhost:8080/products/";
