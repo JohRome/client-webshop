@@ -1,16 +1,21 @@
 package com.jrome.httpclient;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.jrome.payload.LoginDTO;
 import com.jrome.payload.ProductDTO;
 import com.jrome.utils.Input;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class AdminAPI {
 
@@ -53,7 +58,7 @@ public class AdminAPI {
         if (response.statusCode() == 200) {
             extractAuthToken(response.body());
             System.out.println("\nLogin successful.\n");
-            System.out.println(authToken);
+
 
             return true;
         } else {
@@ -61,6 +66,7 @@ public class AdminAPI {
         }
         return false;
     }
+
     private void extractAuthToken(String responseBody) {
         Gson gson = new Gson();
         AuthResponse authResponse = gson.fromJson(responseBody, AuthResponse.class);
@@ -104,15 +110,15 @@ public class AdminAPI {
 
         // Handle the response as needed
         if (response.statusCode() == 200) {
-            System.out.println("Product added successfully.");
+            System.out.println("\nProduct added successfully.\n");
 
             // Print additional information if necessary
-            int statusCode = response.statusCode();
+
             String responseBody = response.body();
             var convertedBody = gson.fromJson(responseBody, ProductDTO.class);
 
-            System.out.println("Status Code: " + statusCode);
-            System.out.println("Converted Body: " + convertedBody);
+
+            System.out.println("New Product:\n" + convertedBody);
         } else {
             System.out.println("Error adding product. Status code: " + response.statusCode());
             System.out.println("Response Body: " + response.body());
@@ -161,7 +167,19 @@ public class AdminAPI {
         }
     }
 
-     public void deleteProductAsAdmin(String id) throws URISyntaxException, InterruptedException {
+    public void deleteProductAsAdmin(String id) throws URISyntaxException, InterruptedException, IOException {
+        // Fetch all products
+        List<ProductDTO> allProducts = getAllProducts();
+
+        // Assuming getId() returns a primitive type (e.g., long)
+        boolean productExists = allProducts.stream().anyMatch(product -> product.getId() == Long.parseLong(id));
+
+        if (!productExists) {
+            System.out.println("\nProduct with ID " + id + " does not exist.");
+            System.out.flush(); // Explicitly flush the output buffer
+            return;
+        }
+
         String deleteProductURL = "http://localhost:8080/products/" + id;
 
         // Ensure authToken is not null or empty before making the request
@@ -184,7 +202,7 @@ public class AdminAPI {
 
             // Handle the response status
             if (response.statusCode() == 200) {
-                System.out.println("Product deleted successfully.");
+                System.out.println("\nProduct deleted successfully.");
             } else {
                 System.out.println("Error deleting product. Status code: " + response.statusCode());
                 System.out.println("Response Body: " + response.body());
@@ -193,4 +211,42 @@ public class AdminAPI {
             System.out.println("An error occurred: " + e.getMessage());
         }
     }
+
+    // Helper method to fetch all products
+    public void displayAllProducts(List<ProductDTO> products) {
+        for (ProductDTO product : products) {
+            System.out.println("\nProduct id: " + product.getId());
+            System.out.println("Product name: " + product.getName());
+            System.out.println("Product price: " + product.getPrice());
+            System.out.println("Product description: " + product.getDescription());
+        }
+    }
+
+    public List<ProductDTO> getAllProducts() throws URISyntaxException, IOException, InterruptedException {
+        String productsURL = "http://localhost:8080/products/";
+
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpRequest getRequest = HttpRequest.newBuilder()
+                .uri(new URI(productsURL))
+                .header("Content-Type", "application/json")
+                .build();
+
+        HttpResponse<String> response = client.send(getRequest, HttpResponse.BodyHandlers.ofString());
+
+        int statusCode = response.statusCode();
+
+        if (statusCode == 200) {
+            Gson gson = new Gson();
+            Type productsType = new TypeToken<ArrayList<ProductDTO>>() {}.getType();
+            return gson.fromJson(response.body(), productsType);
+        } else {
+            System.out.println("Error fetching products. Status code: " + statusCode);
+            return Collections.emptyList();
+        }
+    }
+
+
+
 }
+

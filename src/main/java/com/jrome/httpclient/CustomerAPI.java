@@ -58,7 +58,7 @@ public class CustomerAPI {
         if (response.statusCode() == 200) {
             extractAuthToken(response.body());
             System.out.println("\nLogin successful.\n");
-            System.out.println(authToken);
+
 
 
             return true;
@@ -147,7 +147,7 @@ public class CustomerAPI {
             List<ProductDTO> products = gson.fromJson(response.body(), productsType);
 
             // Print or process the fetched products
-            System.out.println("Fetched Products:");
+            System.out.println("\nAvailable Products:\n");
             for (ProductDTO product : products) {
                 System.out.println("Product ID: " + product.getId() + ", Name: " + product.getName() + ", Price: " + product.getPrice());
             }
@@ -185,7 +185,7 @@ public class CustomerAPI {
         // Handle the response as needed
         if (response.statusCode() == 200) {
             // Print or process the cart products directly from the response body
-            System.out.println("Cart Contents:\n" + response.body());
+            System.out.println("\nCart Contents:\n" + response.body());
         } else {
             System.out.println("Error fetching cart. Status code: " + response.statusCode());
             System.out.println("Response Body: " + response.body());
@@ -224,7 +224,7 @@ public class CustomerAPI {
             System.out.println("Product added to the cart successfully.");
         } else {
             System.out.println("Error adding product to the cart. Status code: " + response.statusCode());
-            System.out.println("Response Body: " + response.body());
+            System.out.println(response.body());
         }
     }
 
@@ -250,19 +250,20 @@ public class CustomerAPI {
                 .uri(new URI(removeFromCartURL))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + authToken)
-                .DELETE()
+                .method("DELETE", HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
 
         HttpResponse<String> response = client.send(removeFromCartRequest, HttpResponse.BodyHandlers.ofString());
 
         // Handle the response as needed
         if (response.statusCode() == 200) {
-            System.out.println("Product removed from the cart successfully. Amount removed: " + quantity);
+            System.out.println("Product removed from the cart successfully. \nAmount removed: " + quantity + " from Product ID: " + productId +".\n");
         } else {
             System.out.println("Error removing product from the cart. Status code: " + response.statusCode());
             System.out.println("Response Body: " + response.body());
         }
     }
+
 
     // Checkout Method
 
@@ -287,7 +288,7 @@ public class CustomerAPI {
         HttpResponse<String> checkoutResponse = client.send(checkoutRequest, HttpResponse.BodyHandlers.ofString());
 
 
-        System.out.println(checkoutResponse.body());
+        System.out.println("\n" + checkoutResponse.body());
     }
 
 }

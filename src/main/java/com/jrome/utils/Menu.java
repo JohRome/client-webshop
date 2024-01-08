@@ -46,26 +46,25 @@ public class Menu {
         outerLoop: while (true) {
             System.out.println("\nAdmin Menu:");
             System.out.println("1. Login");
-            System.out.println("2. CRUD Product List");
-            System.out.println("3. Logout");
+            System.out.println("2. Logout");
 
             int choice = Input.intPut("Enter your choice: ");
 
             switch (choice) {
                 case 1:
-                   aLoggedIn = adminAPI.login();
-                    break;
-                case 2:
-                    if(aLoggedIn) {
+                    aLoggedIn = adminAPI.login();
+                    if (aLoggedIn) {
+                        System.out.println("Redirecting to Admin CRUD Menu...");
                         adminCRUDMenu();
-                        break;
-                    }else {
-                        System.out.println("\nYou have to be logged in as an Admin to be able to reach AdminCrudMenu.");
-                        continue;
+                    } else {
+                        System.out.println("\nLogin failed. Please try again.");
                     }
+                    break;
 
-                case 3:
+                case 2:
                     aLoggedIn = false; // Logout
+                    System.out.println("\nYou have been logged out");
+                    mainMenu(); // Redirect to Main Menu
                     break outerLoop;
 
                 default:
@@ -80,27 +79,31 @@ public class Menu {
     private static void adminCRUDMenu() throws URISyntaxException, IOException, InterruptedException {
         while (true) {
             System.out.println("\nAdmin CRUD Menu:");
-            System.out.println("1. Add Product");
-            System.out.println("2. Update Product");
-            System.out.println("3. Delete Product");
-            System.out.println("4. Back to Admin Menu");
+            System.out.println("1. Show all Products");
+            System.out.println("2. Add Product");
+            System.out.println("3. Update Product");
+            System.out.println("4. Delete Product");
+            System.out.println("5. Back to Admin Menu (You will have to login again)");
 
             int choice = Input.intPut("Enter your choice: ");
 
             switch (choice) {
                 case 1:
+                    customerAPI.getAllProducts();
+                    break;
+                case 2:
                     adminAPI.addProductAsAdmin(Input.stringPut("Enter Product Name: "),
                             Input.intPut("Enter Product Cost: "),
                             Input.stringPut("Enter Product Description: "));
                     break;
-                case 2:
-                    adminAPI.updateProductAsAdmin(Input.stringPut("Enter Product ID:"));// Implement logic to update a product
-                    break;
                 case 3:
-                    adminAPI.deleteProductAsAdmin(Input.stringPut("Enter Product ID: "));// Implement logic to delete a product
+                    adminAPI.updateProductAsAdmin(Input.stringPut("Enter Product ID: "));
                     break;
                 case 4:
-                    return; // Back to Admin Menu
+                    adminAPI.deleteProductAsAdmin(Input.stringPut("Enter Product ID: "));
+                    break;
+                case 5:
+                    adminMenu();
                 default:
                     displayError("Invalid choice. Please try again.");
             }
@@ -142,7 +145,7 @@ public class Menu {
                 }
             }
 
-            System.out.println("You are now logged in. Choose an option:");
+            System.out.println("Choose an option:\n");
             System.out.println("1. Show All Products");
             System.out.println("2. Add Product to Cart");
             System.out.println("3. Remove Product from Cart");
@@ -157,19 +160,23 @@ public class Menu {
                     showAllProducts();
                     break;
                 case 2:
-
                     customerAPI.addToCart(Input.intPut("Enter the product ID to add to the cart: "), Input.intPut("Enter the amount you want to add to the cart: "));
+
                     break;
                 case 3:
+
                     customerAPI.removeFromCart(Input.intPut("Enter the product ID from an item in your cart: "), Input.intPut("Enter the amount you wish to remove: "));
-                case 4:
-                    customerAPI.showCart();
+                    case 4:
+
+                        customerAPI.showCart();
                     break;
                 case 5:
                     customerAPI.checkout();
+
                     break;
                 case 6:
                     cLoggedIn = false; // Logout
+                    System.out.println("\nYou have been logged out\n");
                     break outerLoop;
                 default:
                     displayError("Invalid choice. Please try again.");
