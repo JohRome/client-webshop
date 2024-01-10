@@ -5,7 +5,6 @@ import com.google.gson.reflect.TypeToken;
 import com.jrome.payload.LoginDTO;
 import com.jrome.payload.ProductDTO;
 import com.jrome.payload.RegisterDTO;
-
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -14,10 +13,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-
-import com.jrome.httpclient.AuthResponse;
 import com.jrome.utils.Input;
 
 public class CustomerAPI {
@@ -67,7 +63,7 @@ public class CustomerAPI {
         }
     }
 
-    // Other methods...
+
 
     /**
      * Extracts the authentication token and token type from the login response.

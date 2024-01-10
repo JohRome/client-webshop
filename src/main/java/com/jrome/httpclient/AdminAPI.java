@@ -1,11 +1,9 @@
 package com.jrome.httpclient;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.jrome.payload.LoginDTO;
 import com.jrome.payload.ProductDTO;
 import com.jrome.utils.Input;
-
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
