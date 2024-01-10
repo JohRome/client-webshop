@@ -93,7 +93,7 @@ public class Menu {
                     break;
                 case 2:
                     adminAPI.addProductAsAdmin(Input.stringPut("Enter Product Name: "),
-                            Input.intPut("Enter Product Cost: "),
+                            Input.doublePut("Enter Product Cost: "),
                             Input.stringPut("Enter Product Description: "));
                     break;
                 case 3:

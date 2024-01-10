@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class Input {
 
-    private static final Scanner scanner = new Scanner(System.in);
+    private static final Scanner scanner = new Scanner(System.in); // The only scanner that we initialize.
 
     public static int intPut(String message) {
         System.out.print(message);
@@ -25,12 +25,12 @@ public class Input {
 
     public static double doublePut(String message) {
         System.out.print(message);
-        while (!scanner.hasNextInt()) {
+        while (!scanner.hasNextDouble()) {
             System.out.println("Invalid input. Please enter a valid double.");
             System.out.print(message);
             scanner.next(); // consume the invalid input
         }
-        int input = scanner.nextInt();
+        double input = scanner.nextDouble();
         scanner.nextLine(); // consume the newline character
         return input;
     }
