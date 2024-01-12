@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.jrome.payload.LoginDTO;
 import com.jrome.payload.ProductDTO;
+import com.jrome.payload.PurchaseHistoryDTO;
 import com.jrome.payload.RegisterDTO;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -117,7 +118,7 @@ public class CustomerAPI {
      */
     public void getAllProducts() throws URISyntaxException, IOException, InterruptedException {
         // URL for the products endpoint
-        String productsURL = "http://localhost:8080/products/";
+        String productsURL = "http://localhost:8080/webshop/products/";
 
         // Send GET request to fetch products
         HttpClient client = HttpClient.newHttpClient();
@@ -153,7 +154,7 @@ public class CustomerAPI {
      */
     public void showCart() throws URISyntaxException, IOException, InterruptedException {
         // URL for the cart endpoint
-        String cartURL = "http://localhost:8080/cart/";
+        String cartURL = "http://localhost:8080/webshop/cart/";
 
         // Ensure authToken is not null or empty before making the request
         if (authToken == null || authToken.isEmpty()) {
@@ -189,7 +190,7 @@ public class CustomerAPI {
      */
     public void addToCart(long productId, int quantity) throws URISyntaxException, IOException, InterruptedException {
         // URL for the addToCart endpoint
-        String addToCartURL = "http://localhost:8080/cart/" + productId;
+        String addToCartURL = "http://localhost:8080/webshop/cart/" + productId;
 
         // Ensure authToken is not null or empty before making the request
         if (authToken == null || authToken.isEmpty()) {
@@ -227,7 +228,7 @@ public class CustomerAPI {
      */
     public void removeFromCart(long productId, int quantity) throws URISyntaxException, IOException, InterruptedException {
         // URL for the removeFromCart endpoint
-        String removeFromCartURL = "http://localhost:8080/cart/" + productId;
+        String removeFromCartURL = "http://localhost:8080/webshop/cart/" + productId;
 
         // Ensure authToken is not null or empty before making the request
         if (authToken == null || authToken.isEmpty()) {
@@ -267,7 +268,7 @@ public class CustomerAPI {
      */
     public void checkout() throws URISyntaxException, IOException, InterruptedException {
         // URL for the checkout endpoint
-        String checkoutURL = "http://localhost:8080/checkout";
+        String checkoutURL = "http://localhost:8080/webshop/checkout/";
 
         // Send the checkout request using a DELETE request
         HttpClient client = HttpClient.newHttpClient();
@@ -281,5 +282,39 @@ public class CustomerAPI {
         // Receive and print the checkout response
         HttpResponse<String> checkoutResponse = client.send(checkoutRequest, HttpResponse.BodyHandlers.ofString());
         System.out.println("\n" + checkoutResponse.body());
+    }
+
+    // Johan har lagt till detta för att testa hur history för customer ser ut
+    public void getPurchaseHistory() throws URISyntaxException, IOException, InterruptedException {
+        // URL for the checkout endpoint
+        String checkoutURL = "http://localhost:8080/webshop/history/customer";
+
+        // Send the checkout request using a DELETE request
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest checkoutRequest = HttpRequest.newBuilder()
+                .uri(new URI(checkoutURL))
+                .header("Content-type", "application/json")  // Adjust the content type
+                .header("Authorization", "Bearer " + authToken)
+                .GET()
+                .build();
+
+
+
+        // Receive and print the checkout response
+        HttpResponse<String> purchaseHistoryResponse = client.send(checkoutRequest, HttpResponse.BodyHandlers.ofString());
+
+        int statusCode = purchaseHistoryResponse.statusCode();
+
+        if (statusCode == 200) {
+            // Parse and print the fetched products
+            Gson gson = new Gson();
+            Type productsType = new TypeToken<ArrayList<PurchaseHistoryDTO>>() {
+            }.getType();
+            List<PurchaseHistoryDTO> products = gson.fromJson(purchaseHistoryResponse.body(), productsType);
+
+            for (PurchaseHistoryDTO history : products) {
+                System.out.println("\n" + history);
+            }
+        }
     }
 }

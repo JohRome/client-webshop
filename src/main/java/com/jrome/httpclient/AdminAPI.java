@@ -3,6 +3,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.jrome.payload.LoginDTO;
 import com.jrome.payload.ProductDTO;
+import com.jrome.payload.PurchaseHistoryDTO;
 import com.jrome.utils.Input;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -77,7 +78,7 @@ public class AdminAPI {
     public void addProductAsAdmin(String productName, double productCost, String productDesc)
             throws URISyntaxException, IOException, InterruptedException {
 
-        String adminURL = "http://localhost:8080/products/admin";
+        String adminURL = "http://localhost:8080/webshop/products/admin";
 
         // Ensure authToken is not null or empty before making the request
         if (authToken == null || authToken.isEmpty()) {
@@ -126,7 +127,7 @@ public class AdminAPI {
 
     public void updateProductAsAdmin(String id) throws URISyntaxException, IOException, InterruptedException {
 
-
+        long updatedProductId = Long.parseLong(id);
         // Collect updated product details
         String name = Input.stringPut("Enter the updated product name: ");
         String description = Input.stringPut("Enter the updated product description: ");
@@ -134,6 +135,7 @@ public class AdminAPI {
 
         // Create a product object with the updated details
         var updatedProduct = new ProductDTO();
+        updatedProduct.setId(updatedProductId);
         updatedProduct.setName(name);
         updatedProduct.setDescription(description);
         updatedProduct.setPrice(price);
@@ -143,7 +145,9 @@ public class AdminAPI {
         String jsonUpdatedProduct = gson.toJson(updatedProduct);
 
         // Construct the update product URL
-        String updateProductURL = "http://localhost:8080/products/" + id;
+        // Detta funkar inte eftersom vi måste uppdatera med Long id, inte String id
+//        String updateProductURL = "http://localhost:8080/webshop/products/" + id;
+        String updateProductURL = "http://localhost:8080/webshop/products/admin/" + updatedProductId;
 
         // Send the update product request with the authentication token
         HttpClient client = HttpClient.newHttpClient();
@@ -178,7 +182,7 @@ public class AdminAPI {
             return;
         }
 
-        String deleteProductURL = "http://localhost:8080/products/" + id;
+        String deleteProductURL = "http://localhost:8080/webshop/products/" + id;
 
         // Ensure authToken is not null or empty before making the request
         if (authToken == null || authToken.isEmpty()) {
@@ -214,7 +218,7 @@ public class AdminAPI {
 
 
     public List<ProductDTO> getAllProducts() throws URISyntaxException, IOException, InterruptedException {
-        String productsURL = "http://localhost:8080/products/";
+        String productsURL = "http://localhost:8080/webshop/products/";
 
         HttpClient client = HttpClient.newHttpClient();
 
@@ -237,7 +241,36 @@ public class AdminAPI {
         }
     }
 
+    // Johan har lagt till detta för att testa hur histories för admin ser ut
+    public void getPurchaseHistories() throws URISyntaxException, IOException, InterruptedException {
+        // URL for the checkout endpoint
+        String checkoutURL = "http://localhost:8080/webshop/history/admin";
 
+        // Send the checkout request using a DELETE request
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest checkoutRequest = HttpRequest.newBuilder()
+                .uri(new URI(checkoutURL))
+                .header("Content-type", "application/json")  // Adjust the content type
+                .header("Authorization", "Bearer " + authToken)
+                .GET()
+                .build();
 
+        // Receive and print the checkout response
+        HttpResponse<String> purchaseHistoriesResponse = client.send(checkoutRequest, HttpResponse.BodyHandlers.ofString());
+
+        int statusCode = purchaseHistoriesResponse.statusCode();
+
+        if (statusCode == 200) {
+            // Parse and print the fetched products
+            Gson gson = new Gson();
+            Type productsType = new TypeToken<ArrayList<PurchaseHistoryDTO>>() {
+            }.getType();
+            List<PurchaseHistoryDTO> products = gson.fromJson(purchaseHistoriesResponse.body(), productsType);
+
+            for (PurchaseHistoryDTO history : products) {
+                System.out.println("\n" + history);
+            }
+        }
+    }
 }
 
