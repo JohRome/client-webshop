@@ -13,9 +13,8 @@ public class PurchaseHistoryDTO {
     private String history;
 
     private double price;
-
     @Override
     public String toString() {
-        return "History ID: " + id + "\nHistory: " + history + "\nPrice: " + price;
+        return "History ID: " + id  + "\nHistory: " + history + "\nPrice: " + price;
     }
 }

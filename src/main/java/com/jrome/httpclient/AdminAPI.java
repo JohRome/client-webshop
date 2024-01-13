@@ -143,10 +143,7 @@ public class AdminAPI {
         // Convert the product object to JSON
         Gson gson = new Gson();
         String jsonUpdatedProduct = gson.toJson(updatedProduct);
-
-        // Construct the update product URL
-        // Detta funkar inte eftersom vi måste uppdatera med Long id, inte String id
-//        String updateProductURL = "http://localhost:8080/webshop/products/" + id;
+        
         String updateProductURL = "http://localhost:8080/webshop/products/admin/" + updatedProductId;
 
         // Send the update product request with the authentication token
@@ -182,7 +179,7 @@ public class AdminAPI {
             return;
         }
 
-        String deleteProductURL = "http://localhost:8080/webshop/products/" + id;
+        String deleteProductURL = "http://localhost:8080/webshop/products/admin/" + id;
 
         // Ensure authToken is not null or empty before making the request
         if (authToken == null || authToken.isEmpty()) {
@@ -216,7 +213,6 @@ public class AdminAPI {
 
     // Helper method to fetch all products
 
-
     public List<ProductDTO> getAllProducts() throws URISyntaxException, IOException, InterruptedException {
         String productsURL = "http://localhost:8080/webshop/products/";
 
@@ -241,7 +237,6 @@ public class AdminAPI {
         }
     }
 
-    // Johan har lagt till detta för att testa hur histories för admin ser ut
     public void getPurchaseHistories() throws URISyntaxException, IOException, InterruptedException {
         // URL for the checkout endpoint
         String checkoutURL = "http://localhost:8080/webshop/history/admin";
@@ -263,8 +258,7 @@ public class AdminAPI {
         if (statusCode == 200) {
             // Parse and print the fetched products
             Gson gson = new Gson();
-            Type productsType = new TypeToken<ArrayList<PurchaseHistoryDTO>>() {
-            }.getType();
+            Type productsType = new TypeToken<ArrayList<PurchaseHistoryDTO>>() {}.getType();
             List<PurchaseHistoryDTO> products = gson.fromJson(purchaseHistoriesResponse.body(), productsType);
 
             for (PurchaseHistoryDTO history : products) {
