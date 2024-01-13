@@ -2,6 +2,7 @@ package com.jrome.utils;
 
 import com.jrome.httpclient.CustomerAPI;
 import com.jrome.httpclient.AdminAPI;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -42,8 +43,9 @@ public class Menu {
      * Admin menu, providing login, CRUD operations, and logout options.
      */
     private static void adminMenu() throws URISyntaxException, IOException, InterruptedException {
-            boolean aLoggedIn = false;
-        outerLoop: while (true) {
+        boolean aLoggedIn = false;
+        outerLoop:
+        while (true) {
             System.out.println("\nAdmin Menu:");
             System.out.println("1. Login");
             System.out.println("2. Logout");
@@ -83,7 +85,8 @@ public class Menu {
             System.out.println("2. Add Product");
             System.out.println("3. Update Product");
             System.out.println("4. Delete Product");
-            System.out.println("5. Back to Admin Menu (You will have to login again)");
+            System.out.println("5. See All Customers Purchase Histories");
+            System.out.println("6. Back to Admin Menu (You will have to login again)");
 
             int choice = Input.intPut("Enter your choice: ");
 
@@ -103,6 +106,9 @@ public class Menu {
                     adminAPI.deleteProductAsAdmin(Input.stringPut("Enter Product ID: "));
                     break;
                 case 5:
+                    adminAPI.getPurchaseHistories();
+                    break;
+                case 6:
                     adminMenu();
                 default:
                     displayError("Invalid choice. Please try again.");
@@ -116,7 +122,8 @@ public class Menu {
     private static void customerMenu() throws URISyntaxException, IOException, InterruptedException {
         boolean cLoggedIn = false;
 
-       outerLoop: while (true) {
+        outerLoop:
+        while (true) {
             System.out.println("\nCustomer Menu:");
 
             if (!cLoggedIn) {
@@ -151,7 +158,8 @@ public class Menu {
             System.out.println("3. Remove Product from Cart");
             System.out.println("4. Show Cart");
             System.out.println("5. Checkout");
-            System.out.println("6. Logout");
+            System.out.println("6. See Your Purchase History");
+            System.out.println("7. Logout");
 
             int choice = Input.intPut("Enter your choice: ");
 
@@ -166,15 +174,19 @@ public class Menu {
                 case 3:
 
                     customerAPI.removeFromCart(Input.intPut("Enter the product ID from an item in your cart: "), Input.intPut("Enter the amount you wish to remove: "));
-                    case 4:
+                case 4:
 
-                        customerAPI.showCart();
+                    customerAPI.showCart();
                     break;
                 case 5:
                     customerAPI.checkout();
 
                     break;
                 case 6:
+                    customerAPI.getPurchaseHistory();
+
+                    break;
+                case 7:
                     cLoggedIn = false; // Logout
                     System.out.println("\nYou have been logged out\n");
                     break outerLoop;
@@ -208,6 +220,7 @@ public class Menu {
 
     /**
      * Displays an error message.
+     *
      * @param message The error message to be displayed.
      */
     private static void displayError(String message) {
